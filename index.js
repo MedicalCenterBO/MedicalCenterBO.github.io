@@ -21,7 +21,7 @@ const PROPUESTA = {
         ['Frontend', 'Portales de pacientes, médicos y administración, 100 % responsive.'],
         ['Backend', 'Autenticación, permisos, agendas, pagos, facturación, auditoría y errores.'],
         ['Integraciones', 'Medicaltec, Radoffice, Interlab, SBA, banco/pasarela y WhatsApp.'],
-        ['Bots WhatsApp', 'Flujos conversacionales y notificaciones sobre la cuenta de MedicalCenter.'],
+        ['Bots WhatsApp y de voz', 'Bots de WhatsApp con precio fijo por bot y bot de llamadas con IA opcional.'],
         ['Instalación', 'Instalación y configuración del entorno de producción en Ubuntu.'],
         ['Puesta en producción', 'Salida controlada y acompañamiento inicial.'],
         ['Documentación y capacitación', 'Manuales en español y capacitación al personal de TI.'],
@@ -35,6 +35,7 @@ const PROPUESTA = {
         ['Base de datos propia', 'PostgreSQL 16', 'PostgreSQL'],
         ['Servidor web', 'Nginx + Let\'s Encrypt', 'BSD-2 / Apache 2.0'],
         ['Bots WhatsApp', 'WhatsApp Business Cloud API (oficial de Meta)', 'Servicio de Meta'],
+        ['Bot de llamadas IA (opcional)', 'Telefonía SIP + reconocimiento de voz, modelo de IA y voz sintética en español', 'Servicios por consumo'],
     ],
 
     integraciones: {
@@ -50,6 +51,8 @@ const PROPUESTA = {
             ops: ['QR por transacción con vencimiento', 'Confirmación por webhook autenticado y consulta de respaldo', 'Estados pendiente, confirmado, rechazado y vencido', 'Conciliación y reporte de diferencias'] },
         'WhatsApp': { rol: 'Bots y notificaciones',
             ops: ['Consulta de disponibilidad y gestión de citas', 'Confirmaciones, recordatorios y avisos de cambios', 'Avisos de resultados, pagos y facturas', 'Validación de identidad y enlaces seguros al portal'] },
+        'Llamadas IA': { rol: 'Agente de voz con inteligencia artificial (opcional)',
+            ops: ['Llamadas salientes de confirmación y recordatorio', 'Atención de llamadas entrantes 24/7', 'Reserva y reprogramación en Medicaltec', 'Derivación a un operador y transcripción de cada llamada'] },
     },
 
     // [fase, quincena inicio, quincena fin] — 2 quincenas por mes
@@ -61,20 +64,12 @@ const PROPUESTA = {
         ['Portal de médicos y administración', 7, 12],
         ['Radoffice e Interlab', 8, 10],
         ['Pagos QR y facturación SBA', 9, 12],
-        ['Bots de WhatsApp', 9, 13],
+        ['Bots de WhatsApp y de llamadas', 9, 13],
         ['Ajustes y validación con MedicalCenter', 12, 14],
         ['Puesta en producción', 14, 15],
         ['Capacitación TI y acompañamiento', 15, 16],
     ],
 
-    equipo: [
-        ['Jefe de proyecto / Analista', 'Relevamiento, planificación y coordinación con MedicalCenter y terceros.'],
-        ['Arquitecto de software', 'Arquitectura, integraciones críticas y calidad técnica.'],
-        ['2 Desarrolladores backend', 'API, conectores, pagos, facturación y bots.'],
-        ['Desarrollador frontend', 'Portales web responsive y PWA.'],
-        ['Diseñador UX/UI', 'Prototipos, sistema de diseño y accesibilidad.'],
-        ['Ingeniero DevOps', 'Instalación en Ubuntu y configuración del servidor.'],
-    ],
 
     capacitacion: [
         ['Instalación, despliegue y recuperación', 8],
@@ -120,6 +115,7 @@ const PROPUESTA = {
         'MedicalCenter provee la cuenta de WhatsApp Business verificada en Meta Business Manager.',
         'MedicalCenter gestiona el convenio con el banco o la pasarela de pagos y habilita sus credenciales.',
         'Un referente funcional por área valida los entregables en un máximo de 3 días hábiles.',
+        'Si se contrata el bot de llamadas, MedicalCenter provee el número telefónico o troncal SIP y autoriza el uso de servicios externos de voz e IA.',
     ],
 
     exclusiones: [
@@ -142,12 +138,37 @@ const PROPUESTA = {
         ['Integración Interlab vía Medicaltec', 7000],
         ['Pagos QR', 14000, 'Banco/pasarela, estados y conciliación'],
         ['Facturación electrónica SBA', 10000],
-        ['Bots de WhatsApp', 19000, 'Flujos de citas, notificaciones y validación'],
+        ['Plataforma de WhatsApp', 9000, 'Conexión Cloud API, validación de identidad, notificaciones y enlaces seguros'],
         ['Adecuaciones de interfaces con proveedores de terceros', 9000],
         ['Instalación y configuración en Ubuntu', 11000],
         ['Puesta en producción y acompañamiento inicial', 9000],
         ['Documentación, capacitación TI y entrega del código fuente', 5000],
     ],
+
+    // Precio fijo por cada bot de WhatsApp. [nombre, descripción, icono, incluido por defecto]
+    bots: {
+        precio: 10000,
+        tipos: [
+            ['Agendamiento de citas', 'Consulta disponibilidad y reserva, reprograma o cancela citas en Medicaltec.', 'cal', true],
+            ['Resultados', 'Consulta de resultados de laboratorio e imagenología con validación de identidad y enlace seguro.', 'lab', false],
+            ['Pagos y facturación', 'Envía el QR de pago, confirma el cobro y entrega la factura electrónica.', 'pay', false],
+            ['Atención e información', 'Especialidades, médicos, sedes, horarios y preparación de estudios, con derivación a un operador.', 'info', false],
+            ['Agenda para médicos', 'El médico consulta su agenda del día, bloquea horarios y recibe avisos de cambios.', 'doc', false],
+            ['Encuestas de satisfacción', 'Encuesta breve después de la atención, con resultados en el módulo administrativo.', 'star', false],
+        ],
+    },
+
+    llamadas: {
+        precio: 25000,
+        descripcion: 'Un agente de voz que llama y atiende a los pacientes en español natural, conectado a las mismas agendas de Medicaltec que el portal y los bots de WhatsApp.',
+        funciones: [
+            'Llamadas salientes para confirmar y recordar citas.',
+            'Atención de llamadas entrantes 24/7: disponibilidad, reserva y reprogramación.',
+            'Validación de identidad antes de dar información sensible.',
+            'Derivación a un operador humano cuando el paciente lo pide.',
+            'Grabación, transcripción y resumen de cada llamada en el módulo administrativo.',
+        ],
+    },
 
     opcionales: [
         ['Pagos con tarjeta de crédito/débito', 'Integración con pasarela, 3-D Secure y conciliación.', 12000],
@@ -174,6 +195,7 @@ const PROPUESTA = {
         ['Mensajes de WhatsApp', 'Meta', 'Por mensaje de plantilla según la tarifa vigente de Meta; los mensajes de servicio dentro de 24 h no tienen costo.'],
         ['Cobro con QR', 'Banco elegido', 'Comisión por transacción según convenio (usualmente 0 %–1,5 %).'],
         ['Cobro con tarjeta (opcional)', 'Pasarela de pagos', 'Comisión por transacción según convenio (usualmente 3 %–4,5 %).'],
+        ['Llamadas con IA (si se contrata)', 'Operador telefónico y servicios de voz e IA', 'Costo por minuto según consumo: telefonía, reconocimiento y síntesis de voz, y modelo de IA.'],
         ['Certificado SSL', 'Let\'s Encrypt', 'Sin costo, con renovación automática.'],
     ],
 };
@@ -189,13 +211,23 @@ const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const P = PROPUESTA;
 const base = P.precios.reduce((a, r) => a + r[1], 0);
+const totalInicial = base + P.bots.tipos.filter((b) => b[3]).length * P.bots.precio;
+
+// selección vigente de bots y opcionales (la usan la calculadora y el PDF)
+function seleccion() {
+    const bots = $$('[data-bot]').filter((c) => c.checked).map((c) => P.bots.tipos[c.dataset.bot]);
+    const llamadas = $('#voice-opt').checked;
+    const opcionales = $$('[data-opt]').filter((c) => c.checked).map((c) => P.opcionales[c.dataset.opt]);
+    const total = base + bots.length * P.bots.precio + (llamadas ? P.llamadas.precio : 0) + opcionales.reduce((a, o) => a + o[2], 0);
+    return { bots, llamadas, opcionales, total };
+}
 
 /* ---------- datos enlazados ---------- */
 const binds = { numero: P.numero, fecha: P.fecha, validez: P.validez, proveedor: P.proveedor, contacto: P.contacto, meses: P.meses, garantia: P.garantiaMeses };
 $$('[data-bind]').forEach((el) => { el.textContent = binds[el.dataset.bind]; });
 
 /* ---------- contadores animados ---------- */
-const counts = { total: base, meses: P.meses, garantia: P.garantiaMeses, codigo: 100 };
+const counts = { total: totalInicial, meses: P.meses, garantia: P.garantiaMeses, codigo: 100 };
 function countUp(el) {
     const target = counts[el.dataset.count], money = el.hasAttribute('data-money');
     const fmt = (v) => (money ? bs0(v) : Math.round(v));
@@ -285,9 +317,6 @@ html('#gantt',
         `<div class="gantt__row"><p>${esc(t)}</p><div class="gantt__track" style="--q:${Q}">
          <i style="grid-column:${a} / ${b + 1};--d:${i * 70}ms" data-tip="Mes ${Math.ceil(a / 2)} – Mes ${Math.ceil(b / 2)}"></i></div></div>`).join(''));
 
-html('#team', P.equipo.map(([r, d], i) =>
-    `<div class="team__item reveal" style="--d:${i * 50}ms"><span class="avatar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 100-8 4 4 0 000 8zm-7 9a7 7 0 0114 0"/></svg></span><div><h4>${esc(r)}</h4><p>${esc(d)}</p></div></div>`).join(''));
-
 /* ---------- capacitación ---------- */
 const hmax = Math.max(...P.capacitacion.map((c) => c[1]));
 const htot = P.capacitacion.reduce((a, c) => a + c[1], 0);
@@ -315,18 +344,33 @@ $$('.chip').forEach((c) => c.addEventListener('click', () => {
 html('#assumptions', P.supuestos.map((t) => `<li>${esc(t)}</li>`).join(''));
 html('#exclusions', P.exclusiones.map((t) => `<li>${esc(t)}</li>`).join(''));
 
-/* ---------- propuesta económica interactiva ---------- */
-const pmax = Math.max(...P.precios.map((p) => p[1]));
-html('#price-lines', P.precios.map(([t, v, d], i) =>
-    `<div class="line"><span class="line__n">${String(i + 1).padStart(2, '0')}</span>
-     <div class="line__txt"><b>${esc(t)}</b>${d ? `<small>${esc(d)}</small>` : ''}<i class="line__bar" style="--w:${(v / pmax) * 100}%"></i></div>
-     <span class="line__v">${bs0(v)}</span></div>`).join(''));
+/* ---------- bots de WhatsApp y llamadas con IA ---------- */
+const ICONS = {
+    cal: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+    lab: '<path d="M9 3h6M10 3v6l-5 9a2 2 0 002 3h10a2 2 0 002-3l-5-9V3"/><path d="M7 15h10"/>',
+    pay: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v1M14 20h1M18 18h3v3"/>',
+    info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+    doc: '<path d="M12 12a4 4 0 100-8 4 4 0 000 8zm-7 9a7 7 0 0114 0"/><path d="M17 3v4M15 5h4"/>',
+    star: '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>',
+};
+const svg = (k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[k]}</svg>`;
 
+$('#bot-unit').textContent = bs0(P.bots.precio);
+html('#bot-grid', P.bots.tipos.map(([t, d, ico, on], i) =>
+    `<label class="botc"><input type="checkbox" data-bot="${i}"${on ? ' checked' : ''}>
+     <span class="botc__top"><span class="botc__ico">${svg(ico)}</span><span class="botc__check" aria-hidden="true"></span></span>
+     <b>${esc(t)}</b><small>${esc(d)}</small><span class="botc__price">${bs0(P.bots.precio)}</span></label>`).join(''));
+$('#voice-desc').textContent = P.llamadas.descripcion;
+$('#voice-price').textContent = '+ ' + bs0(P.llamadas.precio);
+html('#voice-list', P.llamadas.funciones.map((f) => `<li>${esc(f)}</li>`).join(''));
+html('.wave', Array.from({ length: 32 }, (_, i) => `<i style="--i:${i}"></i>`).join(''));
+
+/* ---------- propuesta económica interactiva ---------- */
 html('#optionals', P.opcionales.map(([t, d, v], i) =>
     `<label class="opt"><input type="checkbox" data-opt="${i}"><span class="switch" aria-hidden="true"></span>
      <div><b>${esc(t)}</b><small>${esc(d)}</small></div><span class="opt__v">+ ${bs0(v)}</span></label>`).join(''));
 
-let shown = base;
+let shown = totalInicial;
 function animateTo(el, from, to) {
     if (reduced) { el.textContent = bs(to); return; }
     const t0 = performance.now();
@@ -338,10 +382,25 @@ function animateTo(el, from, to) {
     requestAnimationFrame(step);
 }
 function recalc() {
-    const sel = $$('[data-opt]').filter((c) => c.checked).map((c) => P.opcionales[c.dataset.opt]);
-    const total = base + sel.reduce((a, o) => a + o[2], 0);
+    const sel = seleccion(), total = sel.total;
+    const lines = [...P.precios];
+    if (sel.bots.length) lines.push([`Bots de WhatsApp (${sel.bots.length} × ${bs0(P.bots.precio)})`, sel.bots.length * P.bots.precio, sel.bots.map((b) => b[0]).join(' · '), 'bot']);
+    if (sel.llamadas) lines.push(['Bot de llamadas con IA', P.llamadas.precio, 'Agente de voz para confirmaciones, recordatorios y atención 24/7', 'bot']);
+    const pmax = Math.max(...lines.map((p) => p[1]));
+    html('#price-lines', lines.map(([t, v, d, tag], i) =>
+        `<div class="line${tag ? ' line--bot' : ''}"><span class="line__n">${String(i + 1).padStart(2, '0')}</span>
+         <div class="line__txt"><b>${esc(t)}</b>${d ? `<small>${esc(d)}</small>` : ''}<i class="line__bar" style="--w:${(v / pmax) * 100}%"></i></div>
+         <span class="line__v">${bs0(v)}</span></div>`).join(''));
+
+    $('#bot-count').textContent = `${sel.bots.length} bot${sel.bots.length === 1 ? '' : 's'} seleccionado${sel.bots.length === 1 ? '' : 's'}`;
+    $('#bot-sub').textContent = bs0(sel.bots.length * P.bots.precio);
+    $('.voice').classList.toggle('is-on', sel.llamadas);
+
     animateTo($('#sum-total'), shown, total); shown = total;
-    $('#sum-note').textContent = sel.length ? `Base ${bs0(base)} + ${sel.length} opcional${sel.length > 1 ? 'es' : ''}` : 'Alcance base llave en mano';
+    const parts = [`${sel.bots.length} bot${sel.bots.length === 1 ? '' : 's'} de WhatsApp`];
+    if (sel.llamadas) parts.push('bot de llamadas IA');
+    if (sel.opcionales.length) parts.push(`${sel.opcionales.length} opcional${sel.opcionales.length > 1 ? 'es' : ''}`);
+    $('#sum-note').textContent = 'Incluye ' + parts.join(' · ');
     const iva = total * P.iva, it = total * P.it;
     $('#t-net').textContent = bs(total - iva - it);
     $('#t-iva').textContent = bs(iva);
@@ -349,8 +408,8 @@ function recalc() {
     html('#milestones', P.hitos.map(([pct, t, w]) =>
         `<div class="ms__item"><div class="ms__pct" style="--p:${pct}">${pct}%</div><div><b>${esc(t)}</b><small>${esc(w)} · ${bs0(total * pct / 100)}</small></div></div>`).join(''));
 }
-$$('[data-opt]').forEach((c) => c.addEventListener('change', recalc));
-$('#sum-total').textContent = bs(base);
+$$('[data-opt], [data-bot], #voice-opt').forEach((c) => c.addEventListener('change', recalc));
+$('#sum-total').textContent = bs(totalInicial);
 recalc();
 
 html('#plans', P.planes.map((p, i) =>

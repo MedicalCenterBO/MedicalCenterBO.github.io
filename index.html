@@ -23,6 +23,7 @@
             <a href="#alcance">Alcance</a>
             <a href="#portal">Portal</a>
             <a href="#arquitectura">Arquitectura</a>
+            <a href="#bots">Bots</a>
             <a href="#cronograma">Cronograma</a>
             <a href="#economica">Inversión</a>
         </nav>
@@ -261,6 +262,7 @@
                 <div class="node">Portal Médicos<small>Web · PWA</small></div>
                 <div class="node">Administración<small>Red interna / VPN</small></div>
                 <button class="node node--btn" data-sys="WhatsApp">Bots WhatsApp<small>WhatsApp Cloud API</small></button>
+                <button class="node node--btn" data-sys="Llamadas IA">Bot de llamadas IA<small>Voz · opcional</small></button>
             </div>
             <div class="arch__flow"><i></i><i></i><i></i></div>
             <div class="arch__col arch__col--core">
@@ -291,11 +293,45 @@
     </div>
 </section>
 
-<!-- 05 INFRAESTRUCTURA -->
-<section class="sec" id="infraestructura">
+<!-- 05 BOTS -->
+<section class="sec" id="bots">
     <div class="wrap">
         <header class="sec__head reveal">
             <span class="sec__num">05</span>
+            <div><h2>Bots de WhatsApp y llamadas con IA</h2>
+            <p class="sec__sub">Cada bot de WhatsApp es un flujo independiente, con su propio objetivo y un <strong>precio fijo</strong>. La plataforma común (conexión con WhatsApp Cloud API, validación de identidad, notificaciones y enlaces seguros) se cotiza una sola vez. Elija los bots que necesita y el total se actualiza en la propuesta económica.</p></div>
+        </header>
+        <div class="bots">
+            <div class="bots__wa reveal">
+                <div class="bots__head">
+                    <div><p class="kicker">WhatsApp</p><h3>Precio fijo por bot</h3></div>
+                    <div class="bots__unit"><b id="bot-unit"></b><small>por bot</small></div>
+                </div>
+                <div class="botgrid" id="bot-grid"></div>
+                <div class="bots__foot"><span id="bot-count"></span><b id="bot-sub"></b></div>
+            </div>
+            <div class="voice reveal">
+                <p class="kicker kicker--light"><span class="dot"></span> Llamadas con IA</p>
+                <h3>Bot de llamadas con inteligencia artificial</h3>
+                <p class="voice__desc" id="voice-desc"></p>
+                <div class="voice__call">
+                    <div class="voice__who"><span class="voice__avatar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2"/></svg></span>
+                        <div><b>Llamando a María Rojas</b><small>Recordatorio · Neurología 09:30</small></div></div>
+                    <div class="wave" aria-hidden="true"></div>
+                    <p class="voice__line"><span>IA</span>“Hola María, le llamo de MedicalCenter para confirmar su cita de mañana a las 9:30. ¿Desea confirmarla?”</p>
+                </div>
+                <ul class="voice__list" id="voice-list"></ul>
+                <label class="voice__toggle"><input type="checkbox" id="voice-opt"><span class="switch" aria-hidden="true"></span><span>Incluir en la propuesta</span><b id="voice-price"></b></label>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 06 INFRAESTRUCTURA -->
+<section class="sec sec--tint" id="infraestructura">
+    <div class="wrap">
+        <header class="sec__head reveal">
+            <span class="sec__num">06</span>
             <div><h2>Recursos de infraestructura</h2></div>
         </header>
         <div class="infra reveal">
@@ -313,25 +349,23 @@
     </div>
 </section>
 
-<!-- 06 CRONOGRAMA -->
-<section class="sec sec--tint" id="cronograma">
-    <div class="wrap">
-        <header class="sec__head reveal">
-            <span class="sec__num">06</span>
-            <div><h2>Cronograma y equipo</h2>
-            <p class="sec__sub"><strong><span data-bind="meses"></span> meses</strong> desde la firma del contrato y la habilitación de accesos, con entregas parciales cada dos semanas para su validación.</p></div>
-        </header>
-        <div class="gantt reveal" id="gantt"></div>
-        <h3 class="h3 reveal">Equipo asignado</h3>
-        <div class="team" id="team"></div>
-    </div>
-</section>
-
-<!-- 07 DOCUMENTACIÓN -->
-<section class="sec" id="documentacion">
+<!-- 07 CRONOGRAMA -->
+<section class="sec" id="cronograma">
     <div class="wrap">
         <header class="sec__head reveal">
             <span class="sec__num">07</span>
+            <div><h2>Cronograma</h2>
+            <p class="sec__sub"><strong><span data-bind="meses"></span> meses</strong> desde la firma del contrato y la habilitación de accesos, con entregas parciales cada dos semanas para su validación.</p></div>
+        </header>
+        <div class="gantt reveal" id="gantt"></div>
+    </div>
+</section>
+
+<!-- 08 DOCUMENTACIÓN -->
+<section class="sec sec--tint" id="documentacion">
+    <div class="wrap">
+        <header class="sec__head reveal">
+            <span class="sec__num">08</span>
             <div><h2>Documentación y capacitación</h2></div>
         </header>
         <div class="two">
@@ -356,11 +390,11 @@
     </div>
 </section>
 
-<!-- 08 GARANTÍA -->
-<section class="sec sec--tint" id="garantia">
+<!-- 09 GARANTÍA -->
+<section class="sec" id="garantia">
     <div class="wrap">
         <header class="sec__head reveal">
-            <span class="sec__num">08</span>
+            <span class="sec__num">09</span>
             <div><h2>Garantía y soporte</h2>
             <p class="sec__sub"><strong><span data-bind="garantia"></span> meses de garantía</strong> desde el acta de aceptación, con corrección de errores y actualizaciones de seguridad sin costo adicional. Corregir un incumplimiento del alcance contratado nunca se considera desarrollo adicional.</p></div>
         </header>
@@ -369,11 +403,11 @@
     </div>
 </section>
 
-<!-- 09 CUMPLIMIENTO -->
-<section class="sec" id="cumplimiento">
+<!-- 10 CUMPLIMIENTO -->
+<section class="sec sec--tint" id="cumplimiento">
     <div class="wrap">
         <header class="sec__head reveal">
-            <span class="sec__num">09</span>
+            <span class="sec__num">10</span>
             <div><h2>Matriz de cumplimiento</h2>
             <p class="sec__sub">Declaración punto por punto frente a la especificación, indicando expresamente cada dependencia.</p></div>
         </header>
@@ -386,11 +420,11 @@
     </div>
 </section>
 
-<!-- 10 SUPUESTOS -->
-<section class="sec sec--tint" id="supuestos">
+<!-- 11 SUPUESTOS -->
+<section class="sec" id="supuestos">
     <div class="wrap">
         <header class="sec__head reveal">
-            <span class="sec__num">10</span>
+            <span class="sec__num">11</span>
             <div><h2>Dependencias, supuestos y exclusiones</h2></div>
         </header>
         <div class="two">
@@ -400,11 +434,11 @@
     </div>
 </section>
 
-<!-- 11 ECONÓMICA -->
-<section class="sec" id="economica">
+<!-- 12 ECONÓMICA -->
+<section class="sec sec--tint" id="economica">
     <div class="wrap">
         <header class="sec__head reveal">
-            <span class="sec__num">11</span>
+            <span class="sec__num">12</span>
             <div><h2>Propuesta económica</h2>
             <p class="sec__sub">En bolivianos, llave en mano, con <strong>impuestos de ley incluidos</strong> y factura. Incluye código fuente, derechos de uso y modificación, documentación, capacitación y garantía. Active los componentes opcionales para ver el total actualizado.</p></div>
         </header>
@@ -412,6 +446,7 @@
         <div class="price">
             <div class="price__list reveal">
                 <div class="lines" id="price-lines"></div>
+                <p class="price__hint">Los bots de WhatsApp y el bot de llamadas se eligen en la <a href="#bots">sección 05</a>.</p>
                 <p class="h4">Componentes opcionales</p>
                 <div id="optionals"></div>
             </div>

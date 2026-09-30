@@ -113,16 +113,16 @@ async function generarPDF() {
     });
 
     // tarjeta de inversión
-    const total = currentTotal();
+    const total = seleccion();
     cy += 22;
     doc.setGState(new doc.GState({ opacity: 0.08 })); color('setFillColor', C.white);
     doc.roundedRect(M, cy, CW, 58, 5, 5, 'F');
     doc.setGState(new doc.GState({ opacity: 1 }));
     color('setDrawColor', [70, 110, 98]); doc.roundedRect(M, cy, CW, 58, 5, 5, 'S');
     font('bold', 7.5, [143, 179, 163]); doc.text('INVERSIÓN TOTAL LLAVE EN MANO', M + 10, cy + 12);
-    font('normal', 30, C.white, 'times'); doc.text(bs(total.value), M + 10, cy + 26);
+    font('normal', 30, C.white, 'times'); doc.text(bs(total.total), M + 10, cy + 26);
     font('normal', 9, [169, 196, 184]);
-    doc.text(total.extras.length ? `Incluye ${total.extras.length} componente(s) opcional(es) · impuestos de ley incluidos (IVA 13 % e IT 3 %)` : 'Moneda nacional · Impuestos de ley incluidos (IVA 13 % e IT 3 %) con factura', M + 10, cy + 33);
+    doc.text(`${total.bots.length} bot(s) de WhatsApp${total.llamadas ? ' · bot de llamadas IA' : ''}${total.opcionales.length ? ` · ${total.opcionales.length} opcional(es)` : ''} · Impuestos de ley incluidos (IVA 13 % e IT 3 %)`, M + 10, cy + 33);
     [[`${P.meses} meses`, 'de implementación'], [`${P.garantiaMeses} meses`, 'de garantía'], ['100 %', 'código fuente entregado']].forEach(([a, b], i) => {
         const x = M + 10 + i * 52;
         font('bold', 15, C.green200); doc.text(a, x, cy + 46);
@@ -189,8 +189,25 @@ async function generarPDF() {
         { columnStyles: { 0: { cellWidth: 44, fontStyle: 'bold', textColor: C.navy }, 2: { cellWidth: 36, textColor: C.green600 } } });
     para(textOf('#arquitectura .muted-light'), { size: 8.5, c: C.muted });
 
-    /* ---------- 05 infraestructura ---------- */
-    h2('05', 'Recursos de infraestructura');
+    /* ---------- 05 bots ---------- */
+    h2('05', 'Bots de WhatsApp y llamadas con IA');
+    para(textOf('#bots .sec__sub').replace(/\s*Elija los bots.*$/, ''));
+    h3(`Bots de WhatsApp · precio fijo de ${bs(P.bots.precio)} por bot`);
+    const elegidos = new Set(total.bots.map((b) => b[0]));
+    table(['Bot', 'Qué hace', 'Precio', 'Incluido'], P.bots.tipos.map(([t, d]) => [t, d, bs(P.bots.precio), elegidos.has(t) ? 'Sí' : 'Opcional']), {
+        columnStyles: { 0: { cellWidth: 42, fontStyle: 'bold', textColor: C.navy }, 2: { cellWidth: 27, halign: 'right' }, 3: { cellWidth: 20, fontStyle: 'bold' } },
+        didParseCell: (d) => {
+            if (d.section === 'head' && d.column.index === 2) d.cell.styles.halign = 'right';
+            if (d.section === 'body' && d.column.index === 3) d.cell.styles.textColor = d.cell.raw === 'Sí' ? C.green600 : C.muted;
+        },
+    });
+    h3(`Bot de llamadas con IA · ${bs(P.llamadas.precio)}${total.llamadas ? ' (incluido)' : ' (opcional)'}`);
+    para(P.llamadas.descripcion);
+    bullets(P.llamadas.funciones);
+    para('Requiere un número telefónico o troncal SIP de MedicalCenter y servicios externos de voz e IA cobrados por minuto, declarados como dependencia externa.', { size: 8.5, c: C.muted });
+
+    /* ---------- 06 infraestructura ---------- */
+    h2('06', 'Recursos de infraestructura');
     ensure(20);
     color('setFillColor', C.dark); doc.roundedRect(M, y - 2, CW, 16, 3, 3, 'F');
     font('normal', 13, C.white, 'times'); doc.text(textOf('.infra__big p'), M + 8, y + 7.8);
@@ -198,14 +215,12 @@ async function generarPDF() {
     bullets([...document.querySelectorAll('#infraestructura .ticks li')].map((li) => li.textContent));
 
     /* ---------- 06 cronograma ---------- */
-    h2('06', 'Cronograma y equipo');
+    h2('07', 'Cronograma');
     para(textOf('#cronograma .sec__sub'));
     drawGantt();
-    h3('Equipo asignado');
-    table(['Rol', 'Responsabilidades'], P.equipo, { columnStyles: { 0: { cellWidth: 58, fontStyle: 'bold', textColor: C.navy } } });
 
     /* ---------- 07 documentación ---------- */
-    h2('07', 'Documentación y capacitación');
+    h2('08', 'Documentación y capacitación');
     h3('Documentación en español');
     bullets([...document.querySelectorAll('#documentacion .card:first-child li')].map((li) => li.textContent));
     h3('Capacitación al personal de TI');
@@ -219,7 +234,7 @@ async function generarPDF() {
     para('Sesiones presenciales o virtuales, grabadas, con materiales entregados a MedicalCenter.', { size: 8.5, c: C.muted });
 
     /* ---------- 08 garantía ---------- */
-    h2('08', 'Garantía y soporte');
+    h2('09', 'Garantía y soporte');
     para(textOf('#garantia .sec__sub'));
     const sevColors = [[180, 35, 24], [224, 166, 74], [47, 111, 202], [154, 165, 161]];
     table(['Criticidad', 'Ejemplo', 'Respuesta', 'Solución / contingencia'], P.sla, {
@@ -229,7 +244,7 @@ async function generarPDF() {
     para(textOf('#garantia > .wrap > p.small'), { size: 8.5, c: C.muted });
 
     /* ---------- 09 cumplimiento ---------- */
-    h2('09', 'Matriz de cumplimiento');
+    h2('10', 'Matriz de cumplimiento');
     para(textOf('#cumplimiento .sec__sub'));
     table(['Req.', 'Requisito', 'Estado', 'Observación / dependencia'],
         P.cumplimiento.map(([n, r, s, o]) => [n, r, s === 'ok' ? 'Cumple' : 'Con dependencia', o]), {
@@ -240,24 +255,26 @@ async function generarPDF() {
         });
 
     /* ---------- 10 supuestos ---------- */
-    h2('10', 'Dependencias, supuestos y exclusiones');
+    h2('11', 'Dependencias, supuestos y exclusiones');
     h3('Dependencias y supuestos');
     bullets(P.supuestos);
     h3('Exclusiones y limitaciones');
     bullets(P.exclusiones, { mark: 'x' });
 
     /* ---------- 11 económica ---------- */
-    h2('11', 'Propuesta económica');
+    h2('12', 'Propuesta económica');
     para(textOf('#economica .sec__sub').replace(/\s*Active los componentes.*$/, ''));
-    const iva = total.value * P.iva, it = total.value * P.it;
+    const iva = total.total * P.iva, it = total.total * P.it;
     const foot = [
-        ['', 'Importe neto sin impuestos', bs(total.value - iva - it)],
+        ['', 'Importe neto sin impuestos', bs(total.total - iva - it)],
         ['', 'IVA (13 %) incluido', bs(iva)],
         ['', 'IT (3 %) incluido', bs(it)],
-        ['', total.extras.length ? 'TOTAL LLAVE EN MANO (con opcionales seleccionados)' : 'TOTAL LLAVE EN MANO (impuestos incluidos)', bs(total.value)],
+        ['', 'TOTAL LLAVE EN MANO (impuestos incluidos)', bs(total.total)],
     ];
     const rows = P.precios.map(([t, v, d], i) => [String(i + 1).padStart(2, '0'), d ? `${t}\n${d}` : t, bs(v)]);
-    total.extras.forEach((o) => rows.push(['+', `${o[0]} (opcional)\n${o[1]}`, bs(o[2])]));
+    total.bots.forEach((b) => rows.push([String(rows.length + 1).padStart(2, '0'), `Bot de WhatsApp: ${b[0]}\nPrecio fijo por bot`, bs(P.bots.precio)]));
+    if (total.llamadas) rows.push([String(rows.length + 1).padStart(2, '0'), 'Bot de llamadas con IA\nAgente de voz para confirmaciones, recordatorios y atención 24/7', bs(P.llamadas.precio)]);
+    total.opcionales.forEach((o) => rows.push(['+', `${o[0]} (opcional)\n${o[1]}`, bs(o[2])]));
     table(['#', 'Componente', 'Importe'], rows, {
         columnStyles: { 0: { cellWidth: 11, textColor: C.muted }, 2: { cellWidth: 34, halign: 'right', fontStyle: 'bold', textColor: C.navy } },
         foot,
@@ -288,7 +305,7 @@ async function generarPDF() {
     });
 
     h3('Forma de pago');
-    table(['%', 'Hito', 'Momento', 'Importe'], P.hitos.map(([pct, t, w]) => [`${pct} %`, t, w, bs(total.value * pct / 100)]), {
+    table(['%', 'Hito', 'Momento', 'Importe'], P.hitos.map(([pct, t, w]) => [`${pct} %`, t, w, bs(total.total * pct / 100)]), {
         columnStyles: { 0: { cellWidth: 16, fontStyle: 'bold', textColor: C.green }, 2: { cellWidth: 26 }, 3: { cellWidth: 34, halign: 'right' } },
         didParseCell: (d) => { if (d.section === 'head' && d.column.index === 3) d.cell.styles.halign = 'right'; },
     });
@@ -340,8 +357,8 @@ async function generarPDF() {
         const label = (x, yy, t) => { font('bold', 6, C.muted); doc.text(t, x, yy); };
         // canales
         label(x0 + 5, top + 7, 'CANALES');
-        ['Portal Pacientes|Web · PWA', 'Portal Médicos|Web · PWA', 'Administración|Red interna / VPN', 'Bots WhatsApp|WhatsApp Cloud API']
-            .forEach((s, i) => { const [a, b] = s.split('|'); box(x0 + 5, top + 10 + i * 12, 40, 10, a, b); });
+        ['Portal Pacientes|Web · PWA', 'Portal Médicos|Web · PWA', 'Administración|Red interna / VPN', 'Bots WhatsApp|WhatsApp Cloud API', 'Bot de llamadas IA|Voz · opcional']
+            .forEach((s, i) => { const [a, b] = s.split('|'); box(x0 + 5, top + 10 + i * 9.6, 40, 8.4, a, b); });
         // núcleo
         const cx = x0 + 60;
         color('setFillColor', C.mint); color('setDrawColor', [159, 210, 181]); doc.setLineDashPattern([1, 1], 0);
@@ -391,11 +408,6 @@ async function generarPDF() {
 
 function textOf2(root, sel) { return clean(root.querySelector(sel)?.textContent || ''); }
 
-// total vigente según los opcionales activados en la calculadora
-function currentTotal() {
-    const extras = [...document.querySelectorAll('[data-opt]')].filter((c) => c.checked).map((c) => P.opcionales[c.dataset.opt]);
-    return { value: base + extras.reduce((a, o) => a + o[2], 0), extras };
-}
 
 document.getElementById('btn-pdf').addEventListener('click', async (e) => {
     const btn = e.currentTarget, label = btn.querySelector('span');
