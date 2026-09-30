@@ -35,6 +35,7 @@ const PROPUESTA = {
         ['Base de datos propia', 'PostgreSQL 16', 'PostgreSQL'],
         ['Servidor web', 'Nginx + Let\'s Encrypt', 'BSD-2 / Apache 2.0'],
         ['Bots WhatsApp', 'WhatsApp Business Cloud API (oficial de Meta)', 'Servicio de Meta'],
+        ['IA conversacional (bots)', 'API de OpenAI', 'Servicio por consumo'],
         ['Bot de llamadas IA (opcional)', 'Telefonía SIP + reconocimiento de voz, modelo de IA y voz sintética en español', 'Servicios por consumo'],
     ],
 
@@ -47,7 +48,7 @@ const PROPUESTA = {
             ops: ['Órdenes y resultados disponibles', 'Visualización y descarga de informes', 'Fechas, exámenes y estados', 'Solo resultados validados y autorizados'] },
         'SBA': { rol: 'Facturación electrónica',
             ops: ['Captura y validación de NIT/CI y razón social', 'Emisión solo con el pago confirmado', 'Facturas de las empresas de Medical y de los médicos', 'Vínculo factura–paciente–pago–servicio y regularización'] },
-        'Banco / Pasarela': { rol: 'Cobros con QR y tarjeta (opcional)',
+        'Banco / Pasarela': { rol: 'Cobros con QR',
             ops: ['QR por transacción con vencimiento', 'Confirmación por webhook autenticado y consulta de respaldo', 'Estados pendiente, confirmado, rechazado y vencido', 'Conciliación y reporte de diferencias'] },
         'WhatsApp': { rol: 'Bots y notificaciones',
             ops: ['Consulta de disponibilidad y gestión de citas', 'Confirmaciones, recordatorios y avisos de cambios', 'Avisos de resultados, pagos y facturas', 'Validación de identidad y enlaces seguros al portal'] },
@@ -94,10 +95,10 @@ const PROPUESTA = {
         ['3.3', 'Agendas médicas sin sobreasignación', 'ok', 'Reserva temporal del cupo y confirmación en Medicaltec.'],
         ['3.4', 'Módulo administrativo', 'ok', 'Cumple.'],
         ['4', 'Integración con Medicaltec por servicios autorizados', 'dep', 'Sin escritura directa en la base de datos. Se entrega la matriz de operaciones.'],
-        ['5', 'Integración con Radoffice', 'dep', 'El visor de imágenes depende de la capacidad de Radoffice; hay un visor propio opcional.'],
+        ['5', 'Integración con Radoffice', 'dep', 'El visor de imágenes depende de la capacidad de Radoffice.'],
         ['6', 'Integración con Interlab a través de Medicaltec', 'dep', 'Depende de la disponibilidad de resultados vía Medicaltec.'],
         ['7', 'Bots de WhatsApp', 'dep', 'Sobre la cuenta de WhatsApp Business de MedicalCenter; plantillas sujetas a aprobación de Meta.'],
-        ['8', 'Pagos mediante QR', 'dep', 'Requiere convenio y API del banco o pasarela que elija MedicalCenter.'],
+        ['8', 'Pagos mediante QR', 'dep', 'Pago con QR. Requiere convenio y API del banco que elija MedicalCenter. El pago con tarjeta no está incluido.'],
         ['9', 'Facturación electrónica con SBA', 'dep', 'Depende de los servicios de emisión de SBA. Solo se factura con el pago confirmado.'],
         ['10', 'Interfaz HTML5, responsive y accesible', 'ok', 'Matriz de compatibilidad aprobada antes del desarrollo.'],
         ['11', 'Infraestructura e instalación en Ubuntu', 'dep', 'Según el datacenter de MedicalCenter. El monitoreo y los respaldos usan las herramientas existentes de MedicalCenter.'],
@@ -111,7 +112,8 @@ const PROPUESTA = {
     supuestos: [
         'MedicalCenter provee servidores, dominio, IP pública y accesos VPN/SSH en un plazo máximo de 10 días hábiles desde la firma.',
         'Medicaltec, Radoffice y SBA disponen de servicios web, o su proveedor puede habilitarlos, para las operaciones requeridas.',
-        'La oferta incluye la coordinación con esos proveedores y una partida para adecuar interfaces. Si un proveedor cotiza un monto mayor, se declara antes de ejecutar.',
+        'La oferta incluye la coordinación con esos proveedores. Si alguno requiere adecuaciones con costo, se cotizan por separado antes de ejecutar.',
+        'MedicalCenter habilita una cuenta de la API de OpenAI para los bots de WhatsApp. Solo se envía la información necesaria para cada conversación, sin datos clínicos innecesarios.',
         'MedicalCenter provee la cuenta de WhatsApp Business verificada en Meta Business Manager.',
         'MedicalCenter gestiona el convenio con el banco o la pasarela de pagos y habilita sus credenciales.',
         'Un referente funcional por área valida los entregables en un máximo de 3 días hábiles.',
@@ -119,27 +121,26 @@ const PROPUESTA = {
     ],
 
     exclusiones: [
-        'Costos, licencias o comisiones de terceros (Meta, banco/pasarela), que se pagan directamente al proveedor del servicio.',
+        'Costos, licencias o comisiones de terceros (Meta, OpenAI, banco), que se pagan directamente al proveedor del servicio.',
         'Hardware, servidores y licencias de sistema operativo.',
         'Monitoreo, observabilidad y respaldos, que se realizan con la infraestructura del datacenter de MedicalCenter.',
         'Capacitación a usuarios finales (médicos, recepción, caja); el personal de TI capacitado la replica.',
-        'Cambios internos a Medicaltec, Radoffice, Interlab o SBA más allá de la partida de adecuaciones.',
+        'Adecuaciones o cambios internos en Medicaltec, Radoffice, Interlab o SBA, que se cotizan por separado si fueran necesarios.',
+        'Pagos con tarjeta de crédito o débito.',
         'Aplicaciones nativas en tiendas; el portal funciona como PWA.',
         'Funcionalidades fuera del alcance aprobado, que se cotizan por horas.',
     ],
 
     precios: [
-        ['Relevamiento, diseño funcional, arquitectura y UX/UI', 12000],
-        ['Portal de pacientes', 29000, 'Registro, identidad, citas, historial y perfil'],
+        ['Portal de pacientes', 18000, 'Registro, identidad, citas, historial y perfil'],
         ['Portal de médicos', 15000, 'Agenda, bloqueos, cupos y estados'],
         ['Módulo administrativo', 18000, 'Roles, parámetros, transacciones, auditoría y conciliación'],
-        ['Integración Medicaltec', 21000, 'Conectores, reintentos, concurrencia y matriz de operaciones'],
+        ['Integración Medicaltec', 17000, 'Conectores, reintentos, concurrencia y matriz de operaciones'],
         ['Integración Radoffice', 8000, 'Estudios, informes y enlaces seguros'],
         ['Integración Interlab vía Medicaltec', 7000],
-        ['Pagos QR', 14000, 'Banco/pasarela, estados y conciliación'],
+        ['Pagos QR', 10000, 'Banco/pasarela, estados y conciliación'],
         ['Facturación electrónica SBA', 10000],
-        ['Plataforma de WhatsApp', 9000, 'Conexión Cloud API, validación de identidad, notificaciones y enlaces seguros'],
-        ['Adecuaciones de interfaces con proveedores de terceros', 9000],
+        ['Plataforma de WhatsApp', 9000, 'Conexión Cloud API, IA conversacional (OpenAI), validación de identidad, notificaciones y enlaces seguros'],
         ['Instalación y configuración en Ubuntu', 11000],
         ['Puesta en producción y acompañamiento inicial', 9000],
         ['Documentación, capacitación TI y entrega del código fuente', 5000],
@@ -170,18 +171,19 @@ const PROPUESTA = {
         ],
     },
 
-    opcionales: [
-        ['Pagos con tarjeta de crédito/débito', 'Integración con pasarela, 3-D Secure y conciliación.', 12000],
-        ['Visor de imágenes médicas propio', 'Si Radoffice no dispone de visor (OHIF, código abierto).', 11000],
-        ['Asistente con IA en WhatsApp', 'Respuestas en lenguaje natural sobre servicios, horarios y preparación de estudios.', 15000],
-    ],
+    opcionales: [],
 
-    hitos: [
-        [30, 'Firma de contrato', 'Anticipo'],
-        [20, 'Aprobación del diseño funcional y UX', 'Mes 2'],
-        [20, 'Portales e integración Medicaltec en pruebas', 'Mes 5'],
-        [20, 'Aceptación y puesta en producción', 'Mes 7'],
-        [10, 'Cierre del acompañamiento', 'Mes 8'],
+    // Una cuota igual por mes, pagada contra la demostración del avance del mes.
+    // [entregable demostrado, avance acumulado del proyecto en %]
+    cuotas: [
+        ['Relevamiento concluido, prototipos navegables y matriz de operaciones de integración.', 12],
+        ['Diseño UX aprobado, arquitectura e instalación base en los servidores de MedicalCenter.', 25],
+        ['Conexión con Medicaltec: pacientes, agendas y registro de citas en ambiente de pruebas.', 38],
+        ['Portal de pacientes: registro, identidad y reserva de citas funcionando en pruebas.', 50],
+        ['Portal de médicos y administración; resultados de Radoffice e Interlab visibles.', 63],
+        ['Pagos QR, facturación SBA y primeros bots de WhatsApp operando en pruebas.', 75],
+        ['Bots completos y bot de llamadas (si aplica), ajustes y validación con MedicalCenter.', 88],
+        ['Puesta en producción, capacitación TI y entrega del código fuente y la documentación.', 100],
     ],
 
     planes: [
@@ -192,9 +194,9 @@ const PROPUESTA = {
     horaExtra: 140,
 
     terceros: [
+        ['IA conversacional de los bots de WhatsApp', 'API de OpenAI', 'Costo por consumo (tokens) según la tarifa vigente de OpenAI. Se usa para entender y responder mensajes en lenguaje natural.'],
         ['Mensajes de WhatsApp', 'Meta', 'Por mensaje de plantilla según la tarifa vigente de Meta; los mensajes de servicio dentro de 24 h no tienen costo.'],
         ['Cobro con QR', 'Banco elegido', 'Comisión por transacción según convenio (usualmente 0 %–1,5 %).'],
-        ['Cobro con tarjeta (opcional)', 'Pasarela de pagos', 'Comisión por transacción según convenio (usualmente 3 %–4,5 %).'],
         ['Llamadas con IA (si se contrata)', 'Operador telefónico y servicios de voz e IA', 'Costo por minuto según consumo: telefonía, reconocimiento y síntesis de voz, y modelo de IA.'],
         ['Certificado SSL', 'Let\'s Encrypt', 'Sin costo, con renovación automática.'],
     ],
@@ -211,6 +213,11 @@ const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const P = PROPUESTA;
 const base = P.precios.reduce((a, r) => a + r[1], 0);
+// importes de las cuotas mensuales: iguales, la última absorbe el redondeo
+function cuotas(total) {
+    const n = P.cuotas.length, c = Math.round((total / n) * 100) / 100;
+    return P.cuotas.map((_, i) => (i < n - 1 ? c : Math.round((total - c * (n - 1)) * 100) / 100));
+}
 const totalInicial = base + P.bots.tipos.filter((b) => b[3]).length * P.bots.precio;
 
 // selección vigente de bots y opcionales (la usan la calculadora y el PDF)
@@ -369,6 +376,7 @@ html('.wave', Array.from({ length: 32 }, (_, i) => `<i style="--i:${i}"></i>`).j
 html('#optionals', P.opcionales.map(([t, d, v], i) =>
     `<label class="opt"><input type="checkbox" data-opt="${i}"><span class="switch" aria-hidden="true"></span>
      <div><b>${esc(t)}</b><small>${esc(d)}</small></div><span class="opt__v">+ ${bs0(v)}</span></label>`).join(''));
+$('#opt-title').hidden = !P.opcionales.length;
 
 let shown = totalInicial;
 function animateTo(el, from, to) {
@@ -405,8 +413,12 @@ function recalc() {
     $('#t-net').textContent = bs(total - iva - it);
     $('#t-iva').textContent = bs(iva);
     $('#t-it').textContent = bs(it);
-    html('#milestones', P.hitos.map(([pct, t, w]) =>
-        `<div class="ms__item"><div class="ms__pct" style="--p:${pct}">${pct}%</div><div><b>${esc(t)}</b><small>${esc(w)} · ${bs0(total * pct / 100)}</small></div></div>`).join(''));
+    const montos = cuotas(total);
+    $('#cuota-n').textContent = `${P.cuotas.length} cuotas mensuales de`;
+    $('#cuota-v').textContent = bs(montos[0]);
+    html('#cuotas', P.cuotas.map(([t, pct], i) =>
+        `<article class="cuota reveal in" style="--p:${pct}"><header><span class="cuota__mes">Mes ${i + 1}</span><b>${bs(montos[i])}</b></header>
+         <p>${esc(t)}</p><div class="cuota__bar"><i></i></div><small>Avance del proyecto: <strong>${pct} %</strong></small></article>`).join(''));
 }
 $$('[data-opt], [data-bot], #voice-opt').forEach((c) => c.addEventListener('change', recalc));
 $('#sum-total').textContent = bs(totalInicial);
@@ -464,7 +476,7 @@ const io = new IntersectionObserver((entries) => entries.forEach((e) => {
     e.target.querySelectorAll?.('[data-count]').forEach(countUp);
     io.unobserve(e.target);
 }), { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-$$('.reveal, .gantt, .training, .lines').forEach((el) => io.observe(el));
+$$('.reveal, .gantt, .training, .lines, .cuotas').forEach((el) => io.observe(el));
 
 /* ---------- progreso y barra superior ---------- */
 addEventListener('scroll', () => {

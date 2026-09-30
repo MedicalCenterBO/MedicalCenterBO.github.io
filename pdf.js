@@ -76,7 +76,7 @@ async function generarPDF() {
         doc.autoTable({
             startY: y, head: [head.map(clean)], body: body.map((r) => r.map((c) => (typeof c === 'object' ? c : clean(c, true)))),
             margin: { left: M, right: M, top: TOP, bottom: 22 },
-            theme: 'plain', rowPageBreak: 'avoid',
+            theme: 'plain', rowPageBreak: 'avoid', showFoot: 'lastPage',
             styles: { font: 'helvetica', fontSize: 8.8, cellPadding: { top: 2.4, bottom: 2.4, left: 3, right: 3 }, textColor: C.ink, lineColor: C.line, lineWidth: { bottom: 0.2 }, valign: 'top' },
             headStyles: { fillColor: C.dark, textColor: C.white, fontStyle: 'bold', fontSize: 8, lineWidth: 0 },
             alternateRowStyles: { fillColor: [250, 252, 251] },
@@ -123,7 +123,7 @@ async function generarPDF() {
     font('normal', 30, C.white, 'times'); doc.text(bs(total.total), M + 10, cy + 26);
     font('normal', 9, [169, 196, 184]);
     doc.text(`${total.bots.length} bot(s) de WhatsApp${total.llamadas ? ' · bot de llamadas IA' : ''}${total.opcionales.length ? ` · ${total.opcionales.length} opcional(es)` : ''} · Impuestos de ley incluidos (IVA 13 % e IT 3 %)`, M + 10, cy + 33);
-    [[`${P.meses} meses`, 'de implementación'], [`${P.garantiaMeses} meses`, 'de garantía'], ['100 %', 'código fuente entregado']].forEach(([a, b], i) => {
+    [[`${P.meses} meses`, 'de implementación'], [`${P.cuotas.length} cuotas`, 'mensuales con avances'], [`${P.garantiaMeses} meses`, 'de garantía']].forEach(([a, b], i) => {
         const x = M + 10 + i * 52;
         font('bold', 15, C.green200); doc.text(a, x, cy + 46);
         font('normal', 8, [184, 207, 197]); doc.text(b, x, cy + 51);
@@ -263,7 +263,7 @@ async function generarPDF() {
 
     /* ---------- 11 económica ---------- */
     h2('12', 'Propuesta económica');
-    para(textOf('#economica .sec__sub').replace(/\s*Active los componentes.*$/, ''));
+    para(textOf('#economica .sec__sub').replace(/\s*Elija los bots.*$/, ''));
     const iva = total.total * P.iva, it = total.total * P.it;
     const foot = [
         ['', 'Importe neto sin impuestos', bs(total.total - iva - it)],
@@ -298,16 +298,29 @@ async function generarPDF() {
         },
     });
 
-    h3('Componentes opcionales');
-    table(['Componente', 'Detalle', 'Importe'], P.opcionales.map(([a, b, c]) => [a, b, bs(c)]), {
+    if (P.opcionales.length) h3('Componentes opcionales');
+    if (P.opcionales.length) table(['Componente', 'Detalle', 'Importe'], P.opcionales.map(([a, b, c]) => [a, b, bs(c)]), {
         columnStyles: { 0: { cellWidth: 52, fontStyle: 'bold', textColor: C.navy }, 2: { cellWidth: 30, halign: 'right' } },
         didParseCell: (d) => { if (d.section === 'head' && d.column.index === 2) d.cell.styles.halign = 'right'; },
     });
 
-    h3('Forma de pago');
-    table(['%', 'Hito', 'Momento', 'Importe'], P.hitos.map(([pct, t, w]) => [`${pct} %`, t, w, bs(total.total * pct / 100)]), {
-        columnStyles: { 0: { cellWidth: 16, fontStyle: 'bold', textColor: C.green }, 2: { cellWidth: 26 }, 3: { cellWidth: 34, halign: 'right' } },
-        didParseCell: (d) => { if (d.section === 'head' && d.column.index === 3) d.cell.styles.halign = 'right'; },
+    h3(`Plan de pagos: ${P.cuotas.length} cuotas mensuales con avances`);
+    para(textOf('.cuotas__intro'), { size: 9.5 });
+    const montos = cuotas(total.total);
+    table(['Cuota', 'Avance demostrado', 'Avance', 'Importe'], P.cuotas.map(([t, pct], i) => [`Mes ${i + 1}`, t, `${pct} %`, bs(montos[i])]), {
+        columnStyles: { 0: { cellWidth: 18, fontStyle: 'bold', textColor: C.green }, 2: { cellWidth: 18, halign: 'right', textColor: C.green600, fontStyle: 'bold' }, 3: { cellWidth: 30, halign: 'right', fontStyle: 'bold', textColor: C.navy } },
+        bodyStyles: { minCellHeight: 11 },
+        foot: [['', 'Total', '', bs(total.total)]],
+        footStyles: { fillColor: C.mint, textColor: C.navy, fontStyle: 'bold' },
+        didParseCell: (d) => { if ((d.section === 'head' || d.section === 'foot') && d.column.index >= 2) d.cell.styles.halign = 'right'; },
+        didDrawCell: (d) => {
+            // barra de avance bajo el porcentaje
+            if (d.section === 'body' && d.column.index === 2) {
+                const pct = P.cuotas[d.row.index][1], w = d.cell.width - 6, bx = d.cell.x + 3, by = d.cell.y + d.cell.height - 3;
+                color('setFillColor', C.line); doc.roundedRect(bx, by, w, 1.2, 0.6, 0.6, 'F');
+                color('setFillColor', C.green); doc.roundedRect(bx, by, w * pct / 100, 1.2, 0.6, 0.6, 'F');
+            }
+        },
     });
 
     h3('Soporte y mantenimiento posterior a la garantía');
@@ -371,7 +384,7 @@ async function generarPDF() {
         // sistemas
         const sx = x0 + CW - 50;
         label(sx, top + 7, 'SISTEMAS INTEGRADOS');
-        ['Medicaltec|Pacientes · agendas · ventas', 'Radoffice|Imagenología', 'Interlab|Laboratorio (vía Medicaltec)', 'SBA|Facturación electrónica', 'Banco / Pasarela|QR · Tarjeta (opcional)']
+        ['Medicaltec|Pacientes · agendas · ventas', 'Radoffice|Imagenología', 'Interlab|Laboratorio (vía Medicaltec)', 'SBA|Facturación electrónica', 'Banco|Pagos con QR']
             .forEach((s, i) => { const [a, b] = s.split('|'); box(sx, top + 10 + i * 9.6, 45, 8.4, a, b); });
         // flechas
         color('setDrawColor', C.green); color('setFillColor', C.green); doc.setLineWidth(0.5);

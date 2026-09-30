@@ -281,7 +281,7 @@
                 <button class="node node--btn" data-sys="Radoffice">Radoffice<small>Imagenología</small></button>
                 <button class="node node--btn" data-sys="Interlab">Interlab<small>Laboratorio (vía Medicaltec)</small></button>
                 <button class="node node--btn" data-sys="SBA">SBA<small>Facturación electrónica</small></button>
-                <button class="node node--btn" data-sys="Banco / Pasarela">Banco / Pasarela<small>QR · Tarjeta (opcional)</small></button>
+                <button class="node node--btn" data-sys="Banco / Pasarela">Banco / Pasarela<small>Pagos con QR</small></button>
             </div>
         </div>
 
@@ -440,14 +440,14 @@
         <header class="sec__head reveal">
             <span class="sec__num">12</span>
             <div><h2>Propuesta económica</h2>
-            <p class="sec__sub">En bolivianos, llave en mano, con <strong>impuestos de ley incluidos</strong> y factura. Incluye código fuente, derechos de uso y modificación, documentación, capacitación y garantía. Active los componentes opcionales para ver el total actualizado.</p></div>
+            <p class="sec__sub">En bolivianos, llave en mano, con <strong>impuestos de ley incluidos</strong> y factura. Incluye código fuente, derechos de uso y modificación, documentación, capacitación y garantía. Elija los bots en la sección 05 y el total se actualiza al instante.</p></div>
         </header>
 
         <div class="price">
             <div class="price__list reveal">
                 <div class="lines" id="price-lines"></div>
                 <p class="price__hint">Los bots de WhatsApp y el bot de llamadas se eligen en la <a href="#bots">sección 05</a>.</p>
-                <p class="h4">Componentes opcionales</p>
+                <p class="h4" id="opt-title">Componentes opcionales</p>
                 <div id="optionals"></div>
             </div>
 
@@ -462,10 +462,15 @@
                         <div><dt>IT 3 % incluido</dt><dd id="t-it"></dd></div>
                     </dl>
                     <p class="sum__label">Forma de pago</p>
-                    <div class="ms" id="milestones"></div>
+                    <div class="sum__cuota"><span id="cuota-n"></span><b id="cuota-v"></b><small>Cada cuota se paga contra la demostración del avance del mes.</small></div>
+                    <a href="#plan-pagos" class="sum__link">Ver avances por mes ↓</a>
                 </div>
             </aside>
         </div>
+
+        <h3 class="h3 reveal" id="plan-pagos">Plan de pagos mensual con avances</h3>
+        <p class="sec__sub reveal cuotas__intro">Una cuota por mes durante la implementación. Al cierre de cada mes, <span data-bind="proveedor"></span> demuestra en los servidores de MedicalCenter el avance indicado y, con la conformidad de MedicalCenter, se emite la factura de la cuota.</p>
+        <div class="cuotas" id="cuotas"></div>
 
         <h3 class="h3 reveal">Soporte y mantenimiento posterior a la garantía</h3>
         <div class="plans" id="plans"></div>
