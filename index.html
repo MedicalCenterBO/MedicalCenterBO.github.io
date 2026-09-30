@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propuesta · Portal de Autogestión y Bots WhatsApp · Clínica MedicalCenter</title>
+    <meta name="description" content="Propuesta técnica y económica para el Portal de Autogestión de pacientes y médicos, e integración de bots de WhatsApp para Clínica MedicalCenter.">
+    <link rel="icon" href="https://medicalcenter.bo/wp-content/uploads/2021/05/cropped-logo-32x32.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<div class="progress" aria-hidden="true"><span id="progress"></span></div>
+
+<!-- ============ BARRA SUPERIOR ============ -->
+<header class="topbar" id="topbar">
+    <div class="wrap topbar__in">
+        <a href="#inicio" class="topbar__brand"><img src="assets/logo.png" alt="Clínica MedicalCenter"></a>
+        <nav class="topbar__nav" aria-label="Secciones">
+            <a href="#alcance">Alcance</a>
+            <a href="#portal">Portal</a>
+            <a href="#arquitectura">Arquitectura</a>
+            <a href="#cronograma">Cronograma</a>
+            <a href="#economica">Inversión</a>
+        </nav>
+        <button class="btn btn--dark btn--sm" id="btn-pdf" type="button">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>PDF</span>
+        </button>
+    </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="inicio">
+    <div class="hero__glow hero__glow--a"></div>
+    <div class="hero__glow hero__glow--b"></div>
+    <div class="wrap hero__in">
+        <div class="hero__text reveal">
+            <p class="eyebrow eyebrow--light"><span class="dot"></span> Propuesta técnica y económica · Llave en mano</p>
+            <h1>La clínica en el bolsillo de <em>cada paciente</em></h1>
+            <p class="lead">Portal de autogestión para pacientes y médicos con bots de WhatsApp: agendar, pagar con QR, recibir la factura y consultar resultados de laboratorio e imagenología, integrado con Medicaltec, Radoffice, Interlab y SBA.</p>
+            <div class="hero__cta">
+                <a href="#portal" class="btn btn--primary">Explorar el portal</a>
+                <a href="#economica" class="btn btn--glass">Ver inversión</a>
+            </div>
+            <dl class="hero__meta">
+                <div><dt>Cliente</dt><dd>Clínica MedicalCenter</dd></div>
+                <div><dt>Propuesta</dt><dd data-bind="numero"></dd></div>
+                <div><dt>Fecha</dt><dd data-bind="fecha"></dd></div>
+                <div><dt>Validez</dt><dd data-bind="validez"></dd></div>
+            </dl>
+        </div>
+
+        <div class="hero__visual reveal" aria-label="Ejemplo de conversación con el bot de WhatsApp">
+            <div class="float-card float-card--a"><span class="fc-ico">✓</span><div><b>Cita confirmada</b><small>Registrada en Medicaltec</small></div></div>
+            <div class="float-card float-card--b"><span class="fc-ico fc-ico--qr">QR</span><div><b>Pago recibido</b><small>Factura SBA emitida</small></div></div>
+            <div class="phone phone--hero">
+                <div class="phone__notch"></div>
+                <div class="wa-head">
+                    <img src="https://medicalcenter.bo/wp-content/uploads/2021/05/cropped-logo-32x32.png" alt="">
+                    <div><b>MedicalCenter</b><small id="wa-status">en línea</small></div>
+                </div>
+                <div class="wa-chat" id="wa-chat"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="wrap">
+        <div class="stats reveal">
+            <div class="stat"><b data-count="total" data-money>0</b><span>Inversión llave en mano, impuestos incluidos</span></div>
+            <div class="stat"><b><span data-count="meses">0</span> meses</b><span>de implementación</span></div>
+            <div class="stat"><b><span data-count="garantia">0</span> meses</b><span>de garantía sin costo</span></div>
+            <div class="stat"><b><span data-count="codigo">0</span> %</b><span>del código fuente para MedicalCenter</span></div>
+        </div>
+    </div>
+</section>
+
+<main>
+
+<!-- 01 RESUMEN -->
+<section class="sec" id="resumen">
+    <div class="wrap">
+        <header class="sec__head reveal">
+            <span class="sec__num">01</span>
+            <div><h2>Resumen ejecutivo</h2>
+            <p class="sec__sub">Diseñamos, desarrollamos, integramos y ponemos en producción el Portal de Autogestión MedicalCenter y sus bots de WhatsApp en los servidores Ubuntu de la clínica. El código fuente completo y su historial quedan en el GIT de MedicalCenter, con derechos para mantenerlo y modificarlo directamente o mediante terceros.</p></div>
+        </header>
+        <div class="pillars">
+            <article class="pillar reveal"><span class="pillar__ico">
+                <svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 100-8 4 4 0 000 8zm-7 9a7 7 0 0114 0" /></svg></span>
+                <h3>Pacientes</h3><p>Registro verificado, citas, pago QR, facturas y resultados de laboratorio e imagenología.</p></article>
+            <article class="pillar reveal"><span class="pillar__ico">
+                <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>
+                <h3>Médicos</h3><p>Agenda diaria y semanal, bloqueos por ausencia o vacaciones, cupos y estados de citas.</p></article>
+            <article class="pillar reveal"><span class="pillar__ico">
+                <svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/></svg></span>
+                <h3>Administración</h3><p>Usuarios y roles, parámetros, transacciones, reprocesos, auditoría y conciliación.</p></article>
+            <article class="pillar reveal"><span class="pillar__ico">
+                <svg viewBox="0 0 24 24"><path d="M4 20l1.3-3.9A8 8 0 1112 20a8 8 0 01-4-1.1L4 20z"/></svg></span>
+                <h3>WhatsApp</h3><p>Agendamiento conversacional, recordatorios, avisos de resultados y pagos, con enlaces seguros.</p></article>
+        </div>
+        <div class="principle reveal">
+            <span class="principle__tag">Principio rector</span>
+            <p><strong>Medicaltec es la fuente de verdad.</strong> Una cita, un pago o una factura solo se muestra como <em>confirmada</em> cuando quedó registrada en el sistema de origen. Todo lo demás aparece como <em>pendiente</em> o <em>fallido</em> y queda visible para reproceso.</p>
+        </div>
+    </div>
+</section>
+
+<!-- 02 ALCANCE -->
+<section class="sec sec--tint" id="alcance">
+    <div class="wrap">
+        <header class="sec__head reveal">
+            <span class="sec__num">02</span>
+            <div><h2>Comprensión del alcance</h2>
+            <p class="sec__sub">Asumimos la responsabilidad integral, desde el relevamiento hasta la garantía. El área de TI de MedicalCenter aporta conocimiento de los datos y autoriza accesos, y <strong>no recibe tareas de programación, configuración ni corrección de defectos</strong>.</p></div>
+        </header>
+        <div class="scope" id="scope-grid"></div>
+    </div>
+</section>
+
+<!-- 03 PORTAL -->
+<section class="sec" id="portal">
+    <div class="wrap">
+        <header class="sec__head reveal">
+            <span class="sec__num">03</span>
+            <div><h2>Así se verá el portal</h2>
+            <p class="sec__sub">Partimos de la identidad de MedicalCenter y la llevamos a un lenguaje más sobrio y clínico. Explore las vistas principales; el diseño final se valida con MedicalCenter en la fase de UX.</p></div>
+        </header>
+
+        <div class="demo reveal">
+            <div class="demo__tabs" role="tablist" aria-label="Vistas del portal">
+                <button role="tab" aria-selected="true" data-tab="paciente">Paciente</button>
+                <button role="tab" aria-selected="false" data-tab="medico">Médico</button>
+                <button role="tab" aria-selected="false" data-tab="admin">Administración</button>
+                <button role="tab" aria-selected="false" data-tab="pago">Pago QR</button>
+                <span class="demo__ink" aria-hidden="true"></span>
+            </div>
+
+            <div class="browser">
+                <div class="browser__bar"><span></span><span></span><span></span><em>🔒 portal.medicalcenter.bo<span id="demo-path">/inicio</span></em></div>
+                <div class="app">
+                    <aside class="app__side">
+                        <img src="assets/logo.png" alt="">
+                        <nav id="demo-nav"></nav>
+                        <div class="app__user"><i>MR</i><div><b id="demo-user">María Rojas</b><small id="demo-role">Paciente</small></div></div>
+                    </aside>
+
+                    <!-- Paciente -->
+                    <div class="app__main panel is-on" data-panel="paciente" role="tabpanel">
+                        <p class="app__hello">Buenos días, <strong>María</strong> 👋</p>
+                        <div class="next">
+                            <div><small>Próxima cita</small><b>Neurología · Dr. R. Salvatierra</b><span>Jueves 08 oct · 09:30 · Sede Cristo Redentor</span></div>
+                            <div class="next__act"><span class="pill pill--ok">Confirmada</span><button class="mini">Reprogramar</button></div>
+                        </div>
+                        <div class="tiles">
+                            <div class="tile"><small>Laboratorio</small><b>Hemograma completo</b><span class="pill pill--ok">Disponible · PDF</span></div>
+                            <div class="tile"><small>Imagenología</small><b>Resonancia magnética</b><span class="pill pill--wait">En validación</span></div>
+                            <div class="tile tile--pay"><small>Pago pendiente</small><b>Bs 350,00</b><button class="mini mini--solid" data-goto="pago">Pagar con QR</button></div>
+                        </div>
+                        <div class="list">
+                            <p class="list__title">Historial reciente</p>
+                            <div class="row"><span>12 sep</span><b>Cardiología · control</b><span class="pill pill--ok">Atendida</span></div>
+                            <div class="row"><span>28 ago</span><b>Ecografía abdominal</b><span class="pill pill--ok">Informe listo</span></div>
+                            <div class="row"><span>15 ago</span><b>Consulta general</b><span class="pill pill--mute">Cancelada</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Médico -->
+                    <div class="app__main panel" data-panel="medico" role="tabpanel">
+                        <div class="app__top"><p class="app__hello">Agenda · <strong>Jueves 08 octubre</strong></p>
+                            <div class="seg"><span class="on">Día</span><span>Semana</span><span>Mes</span></div></div>
+                        <div class="agenda">
+                            <div class="slot"><time>08:30</time><div class="appt appt--ok"><b>Juan Pérez</b><small>Control · Confirmada</small></div></div>
+                            <div class="slot"><time>09:00</time><div class="appt appt--free">Cupo disponible</div></div>
+                            <div class="slot"><time>09:30</time><div class="appt appt--ok"><b>María Rojas</b><small>Primera consulta · Pagada</small></div></div>
+                            <div class="slot"><time>10:00</time><div class="appt appt--wait"><b>Ana Suárez</b><small>Pendiente de confirmación</small></div></div>
+                            <div class="slot"><time>10:30</time><div class="appt appt--block">Bloqueo · Junta médica</div></div>
+                            <div class="slot"><time>11:00</time><div class="appt appt--ok"><b>Luis Vaca</b><small>Control · Confirmada</small></div></div>
+                        </div>
+                    </div>
+
+                    <!-- Admin -->
+                    <div class="app__main panel" data-panel="admin" role="tabpanel">
+                        <p class="app__hello">Transacciones · <strong>hoy</strong></p>
+                        <div class="kpis">
+                            <div><b>248</b><small>Confirmadas</small></div>
+                            <div><b class="c-wait">6</b><small>Pendientes</small></div>
+                            <div><b class="c-bad">2</b><small>Fallidas</small></div>
+                            <div><b>Bs 41.870</b><small>Cobrado QR</small></div>
+                        </div>
+                        <div class="list">
+                            <div class="row row--h"><span>Ref.</span><b>Operación</b><span>Estado</span><span></span></div>
+                            <div class="row"><span class="mono">004812</span><b>Pago QR · Neurología</b><span class="pill pill--ok">Facturado</span><span></span></div>
+                            <div class="row"><span class="mono">004809</span><b>Reserva · Cardiología</b><span class="pill pill--wait">Reintentando</span><span></span></div>
+                            <div class="row"><span class="mono">004801</span><b>Factura SBA · Laboratorio</b><span class="pill pill--bad">Fallida</span><button class="mini">Reprocesar</button></div>
+                        </div>
+                    </div>
+
+                    <!-- Pago -->
+                    <div class="app__main panel" data-panel="pago" role="tabpanel">
+                        <div class="pay">
+                            <div class="pay__info">
+                                <p class="app__hello">Pago de <strong>Consulta Neurología</strong></p>
+                                <dl class="pay__dl">
+                                    <div><dt>Servicio</dt><dd>Primera consulta</dd></div>
+                                    <div><dt>Referencia</dt><dd class="mono">MC-2026-004812</dd></div>
+                                    <div><dt>Moneda</dt><dd>Bolivianos</dd></div>
+                                    <div><dt>Importe</dt><dd class="big">Bs 350,00</dd></div>
+                                </dl>
+                                <ol class="pay__steps" id="pay-steps">
+                                    <li class="done">QR generado</li>
+                                    <li class="now">Esperando confirmación del banco</li>
+                                    <li>Registro en Medicaltec</li>
+                                    <li>Factura emitida por SBA</li>
+                                </ol>
+                                <button class="mini mini--solid" id="pay-sim">Simular pago</button>
+                            </div>
+                            <div class="pay__qr">
+                                <div class="qr" aria-hidden="true"></div>
+                                <small class="muted">Vence en <b id="qr-timer">14:59</b></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="design-notes">
+            <div class="palette reveal">
+                <div class="sw" style="--c:#009f48"><span>Verde MedicalCenter</span><code>#009F48</code></div>
+                <div class="sw" style="--c:#0b3b2e"><span>Verde profundo</span><code>#0B3B2E</code></div>
+                <div class="sw" style="--c:#12263a"><span>Azul clínico</span><code>#12263A</code></div>
+                <div class="sw" style="--c:#e8f5ee"><span>Menta</span><code>#E8F5EE</code></div>
+            </div>
+            <ul class="ticks reveal">
+                <li><strong>100 % responsive</strong>, mobile-first, sin desplazamiento horizontal.</li>
+                <li>Accesibilidad <strong>WCAG 2.1 AA</strong>: contraste, foco visible, teclado y etiquetas.</li>
+                <li>Instalable como <strong>PWA</strong> en el celular, sin tienda de aplicaciones.</li>
+                <li>Estados siempre visibles: <em>confirmado · pendiente · fallido · vencido</em>.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- 04 ARQUITECTURA E INTEGRACIONES -->
+<section class="sec sec--dark" id="arquitectura">
+    <div class="wrap">
+        <header class="sec__head reveal">
+            <span class="sec__num">04</span>
+            <div><h2>Arquitectura e integraciones</h2>
+            <p class="sec__sub">Un backend orquestador es el único punto de contacto con los sistemas de la clínica. Los <strong>reintentos se gestionan en la propia aplicación</strong>, sin colas externas: cada operación se registra con una clave de idempotencia, de modo que un reintento nunca duplica citas, pagos ni facturas. Seleccione un sistema para ver sus operaciones.</p></div>
+        </header>
+
+        <div class="arch reveal">
+            <div class="arch__col">
+                <p class="arch__label">Canales</p>
+                <div class="node">Portal Pacientes<small>Web · PWA</small></div>
+                <div class="node">Portal Médicos<small>Web · PWA</small></div>
+                <div class="node">Administración<small>Red interna / VPN</small></div>
+                <button class="node node--btn" data-sys="WhatsApp">Bots WhatsApp<small>WhatsApp Cloud API</small></button>
+            </div>
+            <div class="arch__flow"><i></i><i></i><i></i></div>
+            <div class="arch__col arch__col--core">
+                <p class="arch__label">Servidor MedicalCenter · Ubuntu LTS</p>
+                <div class="node node--edge">Nginx · HTTPS<small>TLS 1.3 · límite de peticiones</small></div>
+                <div class="node node--core">API / Orquestador<small>Java o Python · Roles · Reglas · Auditoría</small></div>
+                <div class="arch__row">
+                    <div class="node node--sm">Reintentos<small>En la aplicación · idempotencia</small></div>
+                    <div class="node node--sm">PostgreSQL<small>Datos propios</small></div>
+                </div>
+            </div>
+            <div class="arch__flow"><i></i><i></i><i></i></div>
+            <div class="arch__col" id="sys-list">
+                <p class="arch__label">Sistemas integrados</p>
+                <button class="node node--btn is-on" data-sys="Medicaltec">Medicaltec<small>Pacientes · agendas · ventas</small></button>
+                <button class="node node--btn" data-sys="Radoffice">Radoffice<small>Imagenología</small></button>
+                <button class="node node--btn" data-sys="Interlab">Interlab<small>Laboratorio (vía Medicaltec)</small></button>
+                <button class="node node--btn" data-sys="SBA">SBA<small>Facturación electrónica</small></button>
+                <button class="node node--btn" data-sys="Banco / Pasarela">Banco / Pasarela<small>QR · Tarjeta (opcional)</small></button>
+            </div>
+        </div>
+
+        <div class="sysdetail reveal" id="sys-detail" aria-live="polite"></div>
+
+        <h3 class="h3 h3--light reveal">Tecnologías</h3>
+        <div class="stack" id="stack"></div>
+        <p class="small muted-light reveal">Todos los componentes son de código abierto, sin pagos anuales ni periódicos por su uso. El inventario de dependencias y licencias se entrega con el código fuente. El lenguaje del backend (Java o Python) se define con TI de MedicalCenter para facilitar su mantenimiento interno.</p>
+    </div>
+</section>
+
+<!-- 05 INFRAESTRUCTURA -->
+<section class="sec" id="infraestructura">
+    <div class="wrap">
+        <header class="sec__head reveal">
+            <span class="sec__num">05</span>
+            <div><h2>Recursos de infraestructura</h2></div>
+        </header>
+        <div class="infra reveal">
+            <div class="infra__big">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="6" rx="1.5"/><rect x="3" y="14" width="18" height="6" rx="1.5"/><path d="M7 7h.01M7 17h.01"/></svg>
+                <p>Según el alcance y estructura del datacenter de MedicalCenter.</p>
+            </div>
+            <ul class="ticks">
+                <li>Instalación sobre Ubuntu Server LTS con soporte vigente, aprobado por MedicalCenter.</li>
+                <li>Dominio sugerido <code>portal.medicalcenter.bo</code> con HTTPS y renovación automática del certificado.</li>
+                <li>Solo el puerto 443 expuesto; base de datos y consolas en red interna.</li>
+                <li>Servicios con inicio automático después de reinicios y procedimiento de recuperación documentado.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- 06 CRONOGRAMA -->
+<section class="sec sec--tint" id="cronograma">
+    <div class="wrap">
+        <header class="sec__head reveal">
+            <span class="sec__num">06</span>
+            <div><h2>Cronograma y equipo</h2>
+            <p class="sec__sub"><strong><span data-bind="meses"></span> meses</strong> desde la firma del contrato y la habilitación de accesos, con entregas parciales cada dos semanas para su validación.</p></div>
+        </header>
+        <div class="gantt reveal" id="gantt"></div>
+        <h3 class="h3 reveal">Equipo asignado</h3>
+        <div class="team" id="team"></div>
+    </div>
+</section>
+
+<!-- 07 DOCUMENTACIÓN -->
+<section class="sec" id="documentacion">
+    <div class="wrap">
+        <header class="sec__head reveal">
+            <span class="sec__num">07</span>
+            <div><h2>Documentación y capacitación</h2></div>
+        </header>
+        <div class="two">
+            <div class="card reveal">
+                <h3>Documentación en español</h3>
+                <ul class="ticks">
+                    <li>Alcance funcional aprobado.</li>
+                    <li>Arquitectura de la solución.</li>
+                    <li>Manual de instalación y despliegue en Ubuntu.</li>
+                    <li>Guía de uso para pacientes.</li>
+                    <li>Documentación de API (OpenAPI) e integraciones.</li>
+                    <li>Modelo de datos propio y correspondencia entre sistemas.</li>
+                    <li>Documento de configuración de seguridad.</li>
+                </ul>
+            </div>
+            <div class="card reveal">
+                <h3>Capacitación al personal de TI</h3>
+                <div class="training" id="training"></div>
+                <p class="small muted">Sesiones presenciales o virtuales, grabadas, con materiales entregados a MedicalCenter.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 08 GARANTÍA -->
+<section class="sec sec--tint" id="garantia">
+    <div class="wrap">
+        <header class="sec__head reveal">
+            <span class="sec__num">08</span>
+            <div><h2>Garantía y soporte</h2>
+            <p class="sec__sub"><strong><span data-bind="garantia"></span> meses de garantía</strong> desde el acta de aceptación, con corrección de errores y actualizaciones de seguridad sin costo adicional. Corregir un incumplimiento del alcance contratado nunca se considera desarrollo adicional.</p></div>
+        </header>
+        <div class="sla" id="sla"></div>
+        <p class="small muted reveal">Canales: tickets, WhatsApp y correo. Horario: lunes a viernes de 08:00 a 19:00 y sábados de 08:00 a 12:00; incidentes críticos 24/7.</p>
+    </div>
+</section>
+
+<!-- 09 CUMPLIMIENTO -->
+<section class="sec" id="cumplimiento">
+    <div class="wrap">
+        <header class="sec__head reveal">
+            <span class="sec__num">09</span>
+            <div><h2>Matriz de cumplimiento</h2>
+            <p class="sec__sub">Declaración punto por punto frente a la especificación, indicando expresamente cada dependencia.</p></div>
+        </header>
+        <div class="filters reveal" role="group" aria-label="Filtrar requisitos">
+            <button class="chip is-on" data-filter="all">Todos <i id="c-all"></i></button>
+            <button class="chip" data-filter="ok">Cumple <i id="c-ok"></i></button>
+            <button class="chip" data-filter="dep">Con dependencia <i id="c-dep"></i></button>
+        </div>
+        <div class="comp reveal" id="compliance"></div>
+    </div>
+</section>
+
+<!-- 10 SUPUESTOS -->
+<section class="sec sec--tint" id="supuestos">
+    <div class="wrap">
+        <header class="sec__head reveal">
+            <span class="sec__num">10</span>
+            <div><h2>Dependencias, supuestos y exclusiones</h2></div>
+        </header>
+        <div class="two">
+            <div class="card reveal"><h3>Dependencias y supuestos</h3><ul class="bullets" id="assumptions"></ul></div>
+            <div class="card reveal"><h3>Exclusiones y limitaciones</h3><ul class="bullets bullets--x" id="exclusions"></ul></div>
+        </div>
+    </div>
+</section>
+
+<!-- 11 ECONÓMICA -->
+<section class="sec" id="economica">
+    <div class="wrap">
+        <header class="sec__head reveal">
+            <span class="sec__num">11</span>
+            <div><h2>Propuesta económica</h2>
+            <p class="sec__sub">En bolivianos, llave en mano, con <strong>impuestos de ley incluidos</strong> y factura. Incluye código fuente, derechos de uso y modificación, documentación, capacitación y garantía. Active los componentes opcionales para ver el total actualizado.</p></div>
+        </header>
+
+        <div class="price">
+            <div class="price__list reveal">
+                <div class="lines" id="price-lines"></div>
+                <p class="h4">Componentes opcionales</p>
+                <div id="optionals"></div>
+            </div>
+
+            <aside class="price__sum reveal">
+                <div class="sum">
+                    <p class="sum__label">Total de la inversión</p>
+                    <p class="sum__total" id="sum-total"></p>
+                    <p class="sum__note" id="sum-note"></p>
+                    <dl class="sum__tax">
+                        <div><dt>Importe neto</dt><dd id="t-net"></dd></div>
+                        <div><dt>IVA 13 % incluido</dt><dd id="t-iva"></dd></div>
+                        <div><dt>IT 3 % incluido</dt><dd id="t-it"></dd></div>
+                    </dl>
+                    <p class="sum__label">Forma de pago</p>
+                    <div class="ms" id="milestones"></div>
+                </div>
+            </aside>
+        </div>
+
+        <h3 class="h3 reveal">Soporte y mantenimiento posterior a la garantía</h3>
+        <div class="plans" id="plans"></div>
+        <p class="small muted reveal" id="extra-hour"></p>
+
+        <h3 class="h3 reveal">Costos de terceros <span class="muted">(pagados directamente por MedicalCenter)</span></h3>
+        <div class="third reveal" id="third"></div>
+    </div>
+</section>
+
+<!-- FIRMA -->
+<section class="wrap">
+    <div class="sign reveal">
+        <div>
+            <p class="eyebrow eyebrow--light">Presentado por</p>
+            <p class="sign__name" data-bind="proveedor"></p>
+            <p class="sign__contact" data-bind="contacto"></p>
+        </div>
+        <div class="sign__line"><span></span><small>Firma y sello</small></div>
+    </div>
+</section>
+
+</main>
+
+<footer class="foot">
+    <div class="wrap foot__in">
+        <img src="assets/logo.png" alt="Clínica MedicalCenter">
+        <p>Documento confidencial preparado exclusivamente para Clínica MedicalCenter · Av. Cristo Redentor #3730, Santa Cruz, Bolivia.</p>
+    </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="index.js"></script>
+<script src="pdf.js"></script>
+</body>
+</html>
