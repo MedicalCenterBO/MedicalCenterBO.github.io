@@ -551,21 +551,23 @@ $('#extra-hour').textContent = `Hora de desarrollo adicional: ${bs0(P.horaExtra)
 html('#third', P.terceros.map(([a, b, c]) =>
     `<div class="third__item"><b>${esc(a)}</b><span class="tag">${esc(b)}</span><p>${esc(c)}</p></div>`).join(''));
 
-/* ---------- chat animado de WhatsApp: agendar una cita con el bot ---------- */
-// ['in'|'out', texto] · ['btns', opciones, índice elegido] · ['show', id de tarjeta flotante]
+/* ---------- chat animado de WhatsApp: el agente IA atiende como una persona ---------- */
+// ['in'|'out', texto] · ['show', id de tarjeta flotante]
 const chat = [
-    ['out', 'Hola, quiero agendar una cita con Neurología'],
-    ['in', '¡Hola! 👋 Soy el asistente de <b>MedicalCenter</b>. Para buscar su ficha, ¿me indica su número de CI?'],
-    ['out', '4589632'],
-    ['in', 'Gracias, <b>María Rojas</b> ✅<br>Estos son los horarios disponibles con el <b>Dr. R. Salvatierra</b>:'],
-    ['btns', ['Jue 8 · 09:00', 'Jue 8 · 11:00', 'Vie 9 · 15:00'], 0],
-    ['in', 'La consulta cuesta <b>Bs 350</b>. ¿Desea pagar ahora con QR para dejarla confirmada?'],
-    ['btns', ['Pagar con QR', 'Pagar en la clínica'], 0],
-    ['in', '<span class="wa-qr" aria-hidden="true"></span>Escanee el QR o ábralo en su app bancaria. Vence en 15 min.'],
+    ['out', 'Hola buenas noches, mi mamá está con dolores de cabeza muy fuertes desde hace una semana 😟'],
+    ['in', 'Buenas noches 🙏 Lamento mucho lo de su mamá. Por lo que me cuenta, lo mejor es que la vea un <b>neurólogo</b>. ¿Ella ya se atendió antes con nosotros? Si me pasa su CI, reviso su ficha.'],
+    ['out', 'sí, es Rosa Gutiérrez, CI 3214567'],
+    ['in', 'Listo, encontré a doña Rosa ✅ Su última consulta fue con el <b>Dr. Salvatierra</b> en marzo. ¿Prefieren que la vea él de nuevo? El jueves 8 tiene libre a las <b>9:00</b> o a las <b>11:00</b>.'],
+    ['out', 'a esas horas no puedo, trabajo 😕 habrá algo en la tarde?'],
+    ['in', 'Entiendo, sin problema 😊 El jueves en la tarde ya está lleno, pero el <b>viernes 9 a las 15:00</b> le queda un espacio. ¿Les sirve?'],
+    ['out', 'perfecto, el viernes'],
+    ['in', 'Agendado 🗓️ <b>Viernes 9 de octubre, 15:00</b> con el Dr. Salvatierra. La consulta es Bs 350; si quiere le paso el QR y así llegan directo, sin hacer fila en caja.'],
+    ['out', 'dale, pásame'],
+    ['in', '<span class="wa-qr" aria-hidden="true"></span>Aquí está. Y una recomendación: si el dolor empeora de golpe, tiene vómitos o le cuesta hablar, vengan a <b>Emergencias</b> de inmediato, atendemos las 24 horas 🚑'],
     ['show', 'fc-pago'],
-    ['in', '✅ <b>Pago recibido.</b> Su cita quedó confirmada:<br>🧠 Neurología · <b>jueves 8 de octubre, 09:00</b><br>📄 Le envié su factura y le recordaré un día antes.'],
+    ['in', 'Recibí el pago ✅ Le envié la factura por aquí. El jueves le escribo para recordarle la cita. ¡Que se mejore pronto doña Rosa! 💚'],
     ['show', 'fc-cita'],
-    ['out', '¡Gracias! 🙌'],
+    ['out', 'muchas gracias, muy amable 🙏'],
 ];
 async function playChat() {
     const box = $('#wa-chat'), status = $('#wa-status');
@@ -577,43 +579,35 @@ async function playChat() {
         box.scrollTo({ top: box.scrollHeight, behavior: reduced ? 'instant' : 'smooth' });
         return p;
     };
+    const largo = (t) => t.replace(/<[^>]+>/g, '').length;
     const fcs = $$('.float-card');
     if (reduced) {
-        chat.forEach(([c, t, k]) => {
-            if (c === 'btns') { add('btns', t.map((o, i) => `<span class="${i === k ? 'tap' : ''}">${o}</span>`).join('')); add('out', t[k]); }
-            else if (c !== 'show') add(c, t);
-        });
+        chat.forEach(([c, t]) => { if (c !== 'show') add(c, t); });
         fcs.forEach((f) => f.classList.add('is-on'));
         return;
     }
     for (;;) {
         box.innerHTML = '';
         fcs.forEach((f) => f.classList.remove('is-on'));
-        await wait(600);
-        for (const [cls, txt, k] of chat) {
-            if (cls === 'show') { $('#' + txt).classList.add('is-on'); continue; }
+        await wait(700);
+        for (const [cls, txt] of chat) {
+            if (cls === 'show') { await wait(600); $('#' + txt).classList.add('is-on'); continue; }
             if (cls === 'in') {
+                // el agente "escribe" un tiempo proporcional al largo de su respuesta
                 status.textContent = 'escribiendo…';
                 const typing = add('in typing', '<i></i><i></i><i></i>');
-                await wait(1200);
+                await wait(Math.min(2600, 900 + largo(txt) * 11));
                 typing.remove();
                 status.textContent = 'en línea';
                 add('in', txt);
-                await wait(700);
-            } else if (cls === 'btns') {
-                const row = add('btns', txt.map((o) => `<span>${o}</span>`).join(''));
-                await wait(1100);
-                row.children[k].classList.add('tap');
-                await wait(450);
-                add('out', txt[k]);
-                await wait(500);
+                await wait(Math.min(2400, 700 + largo(txt) * 10)); // tiempo de lectura del paciente
             } else {
-                await wait(500);
+                await wait(Math.min(1800, 500 + largo(txt) * 25)); // el paciente escribe
                 add('out', txt);
-                await wait(400);
+                await wait(300);
             }
         }
-        await wait(5000);
+        await wait(6000);
     }
 }
 playChat();

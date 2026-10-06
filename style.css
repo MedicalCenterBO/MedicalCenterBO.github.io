@@ -100,6 +100,7 @@ code, .mono { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; 
 .wa-head img { width: 34px; height: 34px; border-radius: 50%; background: #fff; padding: 3px; }
 .wa-head b { display: block; font-size: .9rem; }
 .wa-head small { font-size: .72rem; opacity: .85; }
+.wa-ai { font-weight: 700; background: rgba(255,255,255,.18); border-radius: 5px; padding: 0 5px; }
 .wa-chat { flex: 1; overflow-y: auto; padding: 14px 12px; display: flex; flex-direction: column; gap: 8px; font-size: .84rem; color: #111; scrollbar-width: none; background-image: radial-gradient(rgba(0,0,0,.035) 1px, transparent 1px); background-size: 14px 14px; }
 .wa-chat p { margin: 0; padding: 8px 11px; border-radius: 12px; max-width: 86%; line-height: 1.4; box-shadow: 0 1px 1px rgba(0,0,0,.08); animation: pop .35s var(--ease); }
 @keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.96); } }
@@ -120,8 +121,8 @@ code, .mono { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; 
 .float-card.is-on { opacity: 1; scale: 1; }
 .float-card b { display: block; color: var(--navy); font-size: .85rem; }
 .float-card small { color: var(--muted); }
-.float-card--a { top: 120px; left: -28px; }
-.float-card--b { bottom: 90px; right: -28px; animation-delay: -3s; }
+.float-card--a { top: 28px; left: -36px; }
+.float-card--b { bottom: 4px; right: -36px; animation-delay: -3s; }
 .fc-ico { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; background: var(--mint); color: var(--green); font-weight: 800; }
 .fc-ico--qr { background: var(--navy); color: #fff; font-size: .7rem; }
 
@@ -412,7 +413,7 @@ code, .mono { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; 
 .crm__stats { display: flex; gap: 22px; margin-left: auto; }
 .crm__stats small { display: block; font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: #8fb3a3; }
 .crm__stats b { font-size: 1.05rem; font-variant-numeric: tabular-nums; }
-.crm__board { display: grid; grid-template-columns: repeat(var(--cols, 5), minmax(210px, 1fr)); gap: 12px; padding: 16px; overflow-x: auto; background: #f4f7f6; min-height: 430px; }
+.crm__board { display: grid; grid-template-columns: repeat(var(--cols, 5), minmax(210px, 1fr)); gap: 12px; padding: 16px; overflow-x: auto; background: #f4f7f6; min-height: 470px; }
 .kcol { display: flex; flex-direction: column; background: #eaf0ed; border-radius: 16px; padding: 10px; border: 2px dashed transparent; transition: background .2s, border-color .2s; }
 .kcol.is-over { background: var(--mint); border-color: var(--green-400); }
 .kcol--won { background: #e3f3ea; }
@@ -467,6 +468,7 @@ body.is-dragging, body.is-dragging * { cursor: grabbing !important; }
 .drawer__close:hover { background: var(--mint); color: var(--green-600); }
 .drawer__meta { display: flex; justify-content: space-between; align-items: center; padding: 0 18px 12px; border-bottom: 1px solid var(--line); }
 .drawer__val { font-family: var(--serif); font-size: 1.2rem; color: var(--navy); }
+.drawer__body > section { flex-shrink: 0; }
 .drawer__body { flex: 1; overflow-y: auto; padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 16px; }
 .drawer__label { margin: 0 0 8px; font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
 .drawer__contact dl { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; }
@@ -583,6 +585,11 @@ body.is-dragging, body.is-dragging * { cursor: grabbing !important; }
     .crm__views { width: 100%; }
     .crm__views button { flex: 1; }
 }
+
+.kcard__case { color: #5b4fd6; font-weight: 700; }
+.drawer__cita { grid-column: 1 / -1; }
+.drawer__cita dd { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.cal__deal { grid-column: 2; justify-self: start; margin-top: 8px; }
 
 /* ---------- infraestructura ---------- */
 .infra { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; align-items: center; }
@@ -839,8 +846,8 @@ body.is-dragging, body.is-dragging * { cursor: grabbing !important; }
     .principle__tag { justify-self: start; }
     .sign { padding: 32px 24px; }
     .foot__in { flex-direction: column; text-align: center; }
-    .float-card--a { left: -4px; top: 170px; }
-    .float-card--b { right: -4px; }
+    .float-card--a { left: -4px; top: 24px; }
+    .float-card--b { right: -4px; bottom: 0; }
 }
 @media screen and (max-width: 560px) {
     .wrap { padding-inline: 16px; }

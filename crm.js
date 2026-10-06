@@ -53,6 +53,7 @@ const DEALS = {
         { n: 'Lucía Fernández', i: 'Consulta de Cardiología', v: 300, c: 'call', s: 1, who: 'ia', t: 'hace 1 h' },
         { n: 'Marco Antelo', i: 'Paquete de laboratorio', v: 650, c: 'portal', s: 2, who: 'Ana', t: 'hace 2 h' },
         { n: 'Sofía Pinto', i: 'Ecografía y consulta', v: 520, c: 'wa', s: 3, who: 'Luis', t: 'ayer' },
+        { n: 'Rosa Gutiérrez', i: 'Consulta de Neurología', v: 350, c: 'wa', s: 4, who: 'ia', t: 'hace 5 min', caso: true, contacto: 'Su hija, por WhatsApp' },
         { n: 'Diego Rojas', i: 'Consulta de Pediatría', v: 250, c: 'wa', s: 4, who: 'Ana', t: 'ayer' },
     ],
     'Cirugías': [
@@ -80,9 +81,27 @@ Object.values(DEALS).forEach((list) => list.forEach((d) => {
     d.id = ++id;
     d.tel = '+591 7' + String(1000000 + ((d.id * 7919) % 8999999)).slice(0, 7);
     d.notes = [{ t: d.s > 1 ? 'Paciente pidió que la llamen por la tarde.' : 'Contacto creado automáticamente desde ' + CHANNEL[d.c] + '.', who: d.s > 1 ? d.who : 'Sistema', when: d.t }];
-    d.chat = seedChat(d);
-    d.handoffDone = false;
+    d.chat = d.caso ? chatDelCaso() : seedChat(d);
+    d.handoffDone = !!d.caso;
+    if (d.caso) d.notes = [
+        { t: 'Cita registrada en Medicaltec: viernes 9 oct, 15:00, Dr. R. Salvatierra. Recordatorio programado para el jueves.', who: 'Asistente IA', when: 'hace 4 min' },
+        { t: 'Pago QR de Bs 350 confirmado por el banco y factura SBA enviada por WhatsApp.', who: 'Sistema', when: 'hace 4 min' },
+        { t: 'Escribe la hija. Síntomas: dolor de cabeza intenso desde hace una semana. Se indicó acudir a Emergencias si empeora. La paciente prefiere horarios de tarde.', who: 'Asistente IA', when: 'hace 5 min' },
+    ];
 }));
+
+// la misma conversación del teléfono de la portada (arreglo «chat» de index.js)
+function chatDelCaso() {
+    const out = [];
+    chat.forEach(([c, t]) => {
+        if (c === 'show') return;
+        const texto = t.replace(/<span class="wa-qr"[^>]*><\/span>/, '[Código QR de pago · Bs 350] ').replace(/<br>/g, ' ').replace(/<[^>]+>/g, '');
+        out.push({ from: c === 'out' ? 'lead' : 'ia', t: texto });
+        if (texto.startsWith('Agendado')) out.push({ from: 'sys', t: 'Cita registrada en Medicaltec · vie 9 oct, 15:00' });
+        if (texto.includes('Código QR')) out.push({ from: 'sys', t: 'Pago confirmado por el banco · factura emitida por SBA' });
+    });
+    return out;
+}
 
 function first(n) { return n.split(' ')[0]; }
 function initials(n) { return n.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase(); }
@@ -134,7 +153,7 @@ function card(d, k) {
             <span class="kcard__who${ia ? ' kcard__who--ia' : ''}">${ia ? 'IA' : esc(d.who)}</span>
             <span class="kcard__v">${bs0(d.v)}</span>
         </div>
-        <small class="kcard__t">${esc(d.t)}</small>
+        <small class="kcard__t">${esc(d.t)}${d.caso ? ' · <span class="kcard__case">agendado y cobrado por IA</span>' : ''}</small>
     </article>`;
 }
 
@@ -274,10 +293,14 @@ function fillDrawer(d) {
     $('#d-interest').textContent = d.i;
     $('#d-stage').textContent = stages[d.s];
     $('#d-value').textContent = bs0(d.v);
-    html('#d-contact', [
+    const datos = [
         ['Teléfono', d.tel], ['Canal', CHANNEL[d.c]], ['Pipeline', pipe],
         ['Paciente en Medicaltec', d.s >= 2 ? 'Vinculado' : 'Por vincular'], ['Responsable', d.who === 'ia' ? 'Asistente IA' : d.who],
-    ].map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join(''));
+    ];
+    if (d.contacto) datos.splice(1, 0, ['Contacto', d.contacto]);
+    html('#d-contact', datos.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('') +
+        (d.caso ? `<div class="drawer__cita"><dt>Cita</dt><dd>Vie 9 oct · 15:00 · Neurología <button type="button" class="mini mini--solid" id="d-cal">Ver en el calendario</button></dd></div>` : ''));
+    $('#d-cal')?.addEventListener('click', () => irACita('rosa'));
     renderNotes(d);
     renderChat(d);
 }
@@ -406,8 +429,16 @@ function citasDe(w) {
             }
         });
     }));
-    // cita fija para la demo de la IA
-    if (w === 0 && !out.some((c) => c.pac === 'Carla Méndez')) out.push({ id: 'fija', d: 3, h: 9, e: 'Neurología', pac: 'Carla Méndez', dr: ESP['Neurología'].dr, est: 'Confirmada', canal: 'WhatsApp (IA)' });
+    if (w === 0) {
+        // coherente con la conversación de la portada: el jueves en Neurología solo quedan 9:00 y 11:00,
+        // y el viernes a las 15:00 se agenda doña Rosa
+        const neuro = (d, h) => out.findIndex((c) => c.d === d && c.h === h && c.e === 'Neurología');
+        [[3, 9], [3, 11], [4, 15]].forEach(([d, h]) => { const i = neuro(d, h); if (i >= 0) out.splice(i, 1); });
+        [[3, 8, 'Luis Vaca'], [3, 10, 'Gabriela Roca'], [3, 12, 'Juan Pérez'], [3, 14, 'Paola Ribera'], [3, 15, 'Miguel Ortiz'], [3, 16, 'Daniela Saucedo']].forEach(([d, h, pac]) => {
+            if (neuro(d, h) < 0) out.push({ id: `0-${d}-${h}-Neurología`, d, h, e: 'Neurología', pac, dr: ESP['Neurología'].dr, est: 'Confirmada', canal: 'Portal' });
+        });
+        out.push({ id: 'rosa', d: 4, h: 15, e: 'Neurología', pac: 'Rosa Gutiérrez', dr: ESP['Neurología'].dr, est: 'Confirmada', canal: 'WhatsApp (IA) · pagada con QR', caso: true });
+    }
     return out;
 }
 const fecha = (w, d) => { const f = new Date(LUNES); f.setDate(f.getDate() + w * 7 + d); return f; };
@@ -451,14 +482,40 @@ function renderCal() {
         <div><b>${esc(c.pac)}</b><small>${esc(c.e)} · ${esc(c.dr)}</small></div>
         <dl><div><dt>Fecha</dt><dd>${DIAS[c.d]} ${fmtDia(fecha(semana, c.d))}, ${hh(c.h)}</dd></div>
             <div><dt>Estado</dt><dd><span class="pill ${c.est === 'Pendiente' ? 'pill--wait' : c.est === 'Atendida' ? 'pill--mute' : 'pill--ok'}">${c.est}</span></dd></div>
-            <div><dt>Agendada por</dt><dd>${esc(c.canal)}</dd></div></dl></div>` : '<p class="muted">Seleccione una cita para ver el detalle.</p>');
+            <div><dt>Agendada por</dt><dd>${esc(c.canal)}</dd></div></dl>
+        ${c.caso ? '<button type="button" class="mini mini--solid cal__deal" id="cal-deal">Ver oportunidad y chat en el CRM</button>' : ''}</div>` : '<p class="muted">Seleccione una cita para ver el detalle.</p>');
+    $('#cal-deal')?.addEventListener('click', irAOportunidad);
+}
+
+// navegación entre la oportunidad de doña Rosa y su cita
+function irACita(idCita) {
+    $('[data-view="cal"]').click();
+    semana = 0; filtro = 'Todas'; citaSel = idCita;
+    $$('#cal-filters .chip').forEach((x) => x.classList.toggle('is-on', x.dataset.esp === 'Todas'));
+    renderCal();
+    const el = $(`[data-cita="${idCita}"]`);
+    if (!el) return;
+    // desplaza solo la grilla (no el contenedor del CRM) y luego la página si hace falta
+    $('.crm').scrollLeft = 0;
+    const sc = $('.cal__scroll');
+    sc.scrollLeft = Math.max(0, el.offsetLeft - sc.clientWidth / 2);
+    const r = el.getBoundingClientRect();
+    if (r.top < 90 || r.bottom > innerHeight - 20) window.scrollBy({ top: r.top - innerHeight / 2, behavior: reduced ? 'instant' : 'smooth' });
+    flash(el);
+}
+function irAOportunidad() {
+    $('[data-view="board"]').click();
+    if (pipe !== 'Consultas') $('[data-pipe="Consultas"]').click();
+    const d = DEALS['Consultas'].find((x) => x.caso);
+    openDrawer(d);
+    flash($(`.kcard[data-id="${d.id}"]`, board));
 }
 
 /* ---------- la IA consulta el calendario ---------- */
 const PREGUNTAS = [
     '¿Qué cupos libres hay el jueves en Neurología?',
     '¿Cuántas citas tiene la Dra. Céspedes esta semana?',
-    '¿Cuál es la próxima cita de Carla Méndez?',
+    '¿Cuándo es la cita de Rosa Gutiérrez?',
     '¿Qué citas están pendientes de confirmar?',
 ];
 html('#cal-chips', PREGUNTAS.map((q) => `<button type="button" class="cal__chip">${esc(q)}</button>`).join(''));
@@ -471,7 +528,7 @@ function responder(q) {
     const citas = citasDe(0);
     const dia = DIAS.findIndex((d) => t.includes(d.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')));
     const esp = Object.keys(ESP).find((e) => t.includes(e.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').slice(0, 6)));
-    const pac = PACIENTES.find((p) => new RegExp(`\\b${p.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').split(' ')[0]}\\b`).test(t));
+    const pac = [...PACIENTES, 'Rosa Gutiérrez'].find((p) => new RegExp(`\\b${p.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').split(' ')[0]}\\b`).test(t));
     const drKey = Object.keys(ESP).find((e) => { const ap = ESP[e].dr.split(' ').pop().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); return ap.length > 3 && t.includes(ap); });
 
     if (/(cupo|libre|disponib|espacio)/.test(t)) {
@@ -495,7 +552,7 @@ function responder(q) {
     if (pac) {
         const prox = [0, 1, 2].flatMap((w) => citasDe(w).filter((c) => c.pac === pac && c.est !== 'Atendida').map((c) => ({ ...c, w })))[0];
         return prox
-            ? `La próxima cita de <b>${esc(pac)}</b> es el <b>${DIAS[prox.d].toLowerCase()} ${fmtDia(fecha(prox.w, prox.d))} a las ${hh(prox.h)}</b>, ${prox.e} con ${prox.dr}. Estado: ${prox.est.toLowerCase()}.`
+            ? `La próxima cita de <b>${esc(pac)}</b> es el <b>${DIAS[prox.d].toLowerCase()} ${fmtDia(fecha(prox.w, prox.d))} a las ${hh(prox.h)}</b>, ${prox.e} con ${prox.dr}. Estado: ${prox.est.toLowerCase()}. Agendada por ${esc(prox.canal)}.`
             : `${esc(pac)} no tiene citas próximas agendadas. ¿Desea que le busque un horario?`;
     }
     return 'Puedo consultar <b>cupos libres</b> por día y especialidad, <b>citas por médico</b>, la <b>próxima cita de un paciente</b> o las <b>citas pendientes</b>. Pruebe con una de las preguntas sugeridas.';
