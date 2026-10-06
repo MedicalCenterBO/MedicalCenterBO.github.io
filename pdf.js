@@ -219,6 +219,9 @@ async function generarPDF() {
     drawPipelines();
     h3('Funcionalidades');
     table(['Funcionalidad', 'Detalle'], P.crm.funciones, { columnStyles: { 0: { cellWidth: 52, fontStyle: 'bold', textColor: C.navy } } });
+    h3('Calendario de citas consultable por la IA');
+    para(P.crm.calendario.descripcion);
+    bullets(P.crm.calendario.puntos);
     ensure(26);
     color('setFillColor', C.dark); doc.roundedRect(M, y - 2, CW, 22, 3, 3, 'F');
     font('bold', 7.5, C.green200); doc.text(total.crm ? 'INCLUIDO EN ESTA PROPUESTA' : 'MÓDULO OPCIONAL', M + 8, y + 4.5);
@@ -293,11 +296,8 @@ async function generarPDF() {
         ['', 'IT (3 %) incluido', bs(it)],
         ['', 'TOTAL LLAVE EN MANO (impuestos incluidos)', bs(total.total)],
     ];
-    const rows = P.precios.map(([t, v, d], i) => [String(i + 1).padStart(2, '0'), d ? `${t}\n${d}` : t, bs(v)]);
-    total.bots.forEach((b) => rows.push([String(rows.length + 1).padStart(2, '0'), `Bot de WhatsApp: ${b[0]}\nPrecio fijo por bot`, bs(P.bots.precio)]));
-    if (total.crm) rows.push([String(rows.length + 1).padStart(2, '0'), 'CRM de pacientes y ventas\nPipelines, arrastrar y soltar, chat de WhatsApp en tiempo real, IA y derivación humana', bs(P.crm.precio)]);
-    if (total.llamadas) rows.push([String(rows.length + 1).padStart(2, '0'), 'Bot de llamadas con IA\nAgente de voz para confirmaciones, recordatorios y atención 24/7', bs(P.llamadas.precio)]);
-    total.opcionales.forEach((o) => rows.push(['+', `${o[0]} (opcional)\n${o[1]}`, bs(o[2])]));
+    // solo los componentes marcados en la lista de selección
+    const rows = total.items.map((it, i) => [String(i + 1).padStart(2, '0'), it.d ? `${it.t}\n${it.d}` : it.t, bs(it.v)]);
     table(['#', 'Componente', 'Importe'], rows, {
         columnStyles: { 0: { cellWidth: 11, textColor: C.muted }, 2: { cellWidth: 34, halign: 'right', fontStyle: 'bold', textColor: C.navy } },
         foot,

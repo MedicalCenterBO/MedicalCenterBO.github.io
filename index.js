@@ -132,19 +132,20 @@ const PROPUESTA = {
         'Funcionalidades fuera del alcance aprobado, que se cotizan por horas.',
     ],
 
+    // [componente, importe, descripción, a dónde lleva "Ver", grupo de la lista de selección]
     precios: [
-        ['Portal de pacientes', 18000, 'Registro, identidad, citas, historial y perfil'],
-        ['Portal de médicos', 15000, 'Agenda, bloqueos, cupos y estados'],
-        ['Módulo administrativo', 18000, 'Roles, parámetros, transacciones, auditoría y conciliación'],
-        ['Integración Medicaltec', 17000, 'Conectores, reintentos, concurrencia y matriz de operaciones'],
-        ['Integración Radoffice', 4000, 'Consulta HTTP que devuelve el enlace del estudio, mostrado en un visor embebido'],
-        ['Integración Interlab vía Medicaltec', 7000],
-        ['Pagos QR', 10000, 'Banco/pasarela, estados y conciliación'],
-        ['Facturación electrónica SBA', 10000],
-        ['Plataforma de WhatsApp', 9000, 'Conexión Cloud API, IA conversacional (OpenAI), validación de identidad, notificaciones y enlaces seguros'],
-        ['Instalación y configuración en Ubuntu', 11000],
-        ['Puesta en producción y acompañamiento inicial', 9000],
-        ['Documentación, capacitación TI y entrega del código fuente', 5000],
+        ['Portal de pacientes', 18000, 'Registro, identidad, citas, resultados, pagos, historial y perfil', { ir: '#portal', tab: 'paciente' }, 'Portal de autogestión'],
+        ['Portal de médicos', 15000, 'Agenda por día, semana y mes; bloqueos, cupos y estados', { ir: '#portal', tab: 'medico' }, 'Portal de autogestión'],
+        ['Módulo administrativo', 18000, 'Usuarios y roles, parámetros, transacciones, reprocesos, auditoría y conciliación', { ir: '#portal', tab: 'admin' }, 'Portal de autogestión'],
+        ['Integración Medicaltec', 17000, 'Conectores, reintentos, concurrencia y matriz de operaciones', { ir: '#arquitectura', sys: 'Medicaltec' }, 'Integraciones'],
+        ['Integración Radoffice', 4000, 'Consulta HTTP que devuelve el enlace del estudio, mostrado en un visor embebido', { ir: '#arquitectura', sys: 'Radoffice' }, 'Integraciones'],
+        ['Integración Interlab vía Medicaltec', 7000, 'Órdenes y resultados de laboratorio con descarga de informes', { ir: '#arquitectura', sys: 'Interlab', req: 'p3' }, 'Integraciones'],
+        ['Pagos QR', 10000, 'QR por transacción, confirmación del banco, estados y conciliación', { ir: '#portal', tab: 'pago' }, 'Integraciones'],
+        ['Facturación electrónica SBA', 10000, 'Emisión de la factura con el pago confirmado y regularización', { ir: '#arquitectura', sys: 'SBA' }, 'Integraciones'],
+        ['Plataforma de WhatsApp', 9000, 'Conexión Cloud API, IA conversacional (OpenAI), validación de identidad, notificaciones y enlaces seguros', { ir: '#bots' }, 'WhatsApp, voz e IA'],
+        ['Instalación y configuración en Ubuntu', 11000, 'Servidor, HTTPS, configuración de seguridad e inicio automático de servicios', { ir: '#infraestructura' }, 'Instalación y entrega'],
+        ['Puesta en producción y acompañamiento inicial', 9000, 'Salida a producción controlada y acompañamiento posterior', { ir: '#cronograma' }, 'Instalación y entrega'],
+        ['Documentación, capacitación TI y entrega del código fuente', 5000, 'Manuales en español, 26 horas de capacitación al personal de TI y repositorio completo', { ir: '#documentacion' }, 'Instalación y entrega'],
     ],
 
     // Precio fijo por cada bot de WhatsApp. [nombre, descripción, icono, incluido por defecto]
@@ -198,7 +199,18 @@ const PROPUESTA = {
             ['Atención por IA y derivación humana', 'La IA atiende 24/7 y, con un clic o a pedido del paciente, un asesor toma la conversación.'],
             ['Notas y ficha de contacto', 'Notas internas, datos de contacto, paciente vinculado en Medicaltec e historial de citas.'],
             ['Asignación y reportes', 'Reparto de oportunidades por asesor, tareas de seguimiento y reportes de conversión del embudo.'],
+            ['Calendario de citas', 'Vista semanal de las citas agendadas en Medicaltec, con filtros por especialidad y médico. La IA lo consulta para responder por cupos y citas.'],
         ],
+        calendario: {
+            descripcion: 'El CRM incluye un calendario con todas las citas agendadas, sincronizado con Medicaltec. Asesores y recepción lo consultan por semana, especialidad o médico, y el asistente IA lo usa para responder a los pacientes y al personal con información real.',
+            puntos: [
+                'Citas por día y semana, con estado: confirmada, pendiente o atendida.',
+                'Filtros por especialidad y médico, y búsqueda por paciente.',
+                'Detalle de cada cita con el canal por el que se agendó (WhatsApp, llamada o portal).',
+                'La IA responde preguntas como "¿qué cupos hay el jueves en Neurología?" o "¿cuál es la próxima cita de un paciente?".',
+                'La IA solo consulta la información; reservar o cambiar citas sigue las reglas y permisos de Medicaltec.',
+            ],
+        },
         pipelines: {
             'Consultas': ['Nuevo', 'Atendido por IA', 'Con asesor', 'Cotizado', 'Agendado'],
             'Cirugías': ['Interesado', 'Evaluación médica', 'Presupuesto enviado', 'Negociación', 'Programada'],
@@ -245,22 +257,33 @@ const html = (sel, str) => { $(sel).innerHTML = str; };
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const P = PROPUESTA;
-const base = P.precios.reduce((a, r) => a + r[1], 0);
 // importes de las cuotas mensuales: iguales, la última absorbe el redondeo
 function cuotas(total) {
     const n = P.cuotas.length, c = Math.round((total / n) * 100) / 100;
     return P.cuotas.map((_, i) => (i < n - 1 ? c : Math.round((total - c * (n - 1)) * 100) / 100));
 }
-const totalInicial = base + P.bots.tipos.filter((b) => b[3]).length * P.bots.precio;
 
-// selección vigente de bots y opcionales (la usan la calculadora y el PDF)
+// lista de selección: cada ítem con su clave, importe, destino de "Ver", grupo y si viene marcado
+const ITEMS = [
+    ...P.precios.map(([t, v, d, ver, g], i) => ({ key: 'p' + i, tipo: 'base', t, v, d, ver, g, on: true })),
+    ...P.bots.tipos.map(([t, d, , on], i) => ({ key: 'b' + i, tipo: 'bot', t: 'Bot de WhatsApp: ' + t, nombre: t, v: P.bots.precio, d, ver: { ir: '#bots', bot: i, req: 'p8' }, g: 'WhatsApp, voz e IA', on })),
+    { key: 'voz', tipo: 'voz', t: 'Bot de llamadas con IA', v: P.llamadas.precio, d: 'Agente de voz para confirmaciones, recordatorios y atención 24/7', ver: { ir: '.voice' }, g: 'WhatsApp, voz e IA', on: false },
+    { key: 'crm', tipo: 'crm', t: 'CRM de pacientes y ventas', v: P.crm.precio, d: 'Pipelines, arrastrar y soltar, chat de WhatsApp en tiempo real, calendario de citas consultable por la IA y derivación humana', ver: { ir: '#crm', req: 'p8' }, g: 'CRM', on: false },
+];
+const totalInicial = ITEMS.filter((i) => i.on).reduce((a, i) => a + i.v, 0);
+
+// selección vigente (la usan la lista, el total y el PDF)
 function seleccion() {
-    const bots = $$('[data-bot]').filter((c) => c.checked).map((c) => P.bots.tipos[c.dataset.bot]);
-    const llamadas = $('#voice-opt').checked;
-    const crm = $('#crm-opt').checked;
-    const opcionales = $$('[data-opt]').filter((c) => c.checked).map((c) => P.opcionales[c.dataset.opt]);
-    const total = base + bots.length * P.bots.precio + (llamadas ? P.llamadas.precio : 0) + (crm ? P.crm.precio : 0) + opcionales.reduce((a, o) => a + o[2], 0);
-    return { bots, llamadas, crm, opcionales, total };
+    const on = new Set($$('[data-item]').filter((c) => c.checked).map((c) => c.dataset.item));
+    const items = ITEMS.filter((i) => on.has(i.key));
+    return {
+        items,
+        bots: items.filter((i) => i.tipo === 'bot').map((i) => P.bots.tipos[+i.key.slice(1)]),
+        llamadas: on.has('voz'),
+        crm: on.has('crm'),
+        opcionales: [],
+        total: items.reduce((a, i) => a + i.v, 0),
+    };
 }
 
 /* ---------- datos enlazados ---------- */
@@ -397,20 +420,46 @@ const ICONS = {
 const svg = (k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[k]}</svg>`;
 
 $('#bot-unit').textContent = bs0(P.bots.precio);
-html('#bot-grid', P.bots.tipos.map(([t, d, ico, on], i) =>
-    `<label class="botc"><input type="checkbox" data-bot="${i}"${on ? ' checked' : ''}>
-     <span class="botc__top"><span class="botc__ico">${svg(ico)}</span><span class="botc__check" aria-hidden="true"></span></span>
-     <b>${esc(t)}</b><small>${esc(d)}</small><span class="botc__price">${bs0(P.bots.precio)}</span></label>`).join(''));
+html('#bot-grid', P.bots.tipos.map(([t, d, ico], i) =>
+    `<article class="botc" id="bot-${i}">
+     <span class="botc__top"><span class="botc__ico">${svg(ico)}</span></span>
+     <b>${esc(t)}</b><small>${esc(d)}</small><span class="botc__price">${bs0(P.bots.precio)}</span></article>`).join(''));
 $('#voice-desc').textContent = P.llamadas.descripcion;
-$('#voice-price').textContent = '+ ' + bs0(P.llamadas.precio);
+$('#voice-price').textContent = bs0(P.llamadas.precio);
 html('#voice-list', P.llamadas.funciones.map((f) => `<li>${esc(f)}</li>`).join(''));
 html('.wave', Array.from({ length: 32 }, (_, i) => `<i style="--i:${i}"></i>`).join(''));
 
-/* ---------- propuesta económica interactiva ---------- */
-html('#optionals', P.opcionales.map(([t, d, v], i) =>
-    `<label class="opt"><input type="checkbox" data-opt="${i}"><span class="switch" aria-hidden="true"></span>
-     <div><b>${esc(t)}</b><small>${esc(d)}</small></div><span class="opt__v">+ ${bs0(v)}</span></label>`).join(''));
-$('#opt-title').hidden = !P.opcionales.length;
+/* ---------- lista de selección y total ---------- */
+const GRUPOS = [...new Set(ITEMS.map((i) => i.g))];
+html('#checklist', GRUPOS.map((g) => {
+    const list = ITEMS.filter((i) => i.g === g);
+    return `<fieldset class="ckgroup"><legend><span>${esc(g)}</span><small data-sub="${esc(g)}"></small></legend>
+        ${list.map((i) => `<div class="ck" data-row="${i.key}">
+            <label class="ck__main"><input type="checkbox" data-item="${i.key}"${i.on ? ' checked' : ''}><span class="ck__box" aria-hidden="true"></span>
+                <span class="ck__txt"><b>${esc(i.t)}</b><small>${esc(i.d)}</small><em class="ck__req" hidden></em></span></label>
+            <button class="ck__ver" type="button" data-ver="${i.key}" aria-label="Ver la explicación de ${esc(i.t)}">Ver
+                <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <span class="ck__v">${bs0(i.v)}</span>
+        </div>`).join('')}
+    </fieldset>`;
+}).join(''));
+
+// dependencias: un bot o el CRM necesitan la plataforma de WhatsApp; Interlab necesita Medicaltec
+const box = (k) => $(`[data-item="${k}"]`);
+function dependencias(changed) {
+    ITEMS.forEach((i) => {
+        const req = i.ver.req; if (!req) return;
+        const need = box(req), me = box(i.key);
+        if (changed === me && me.checked && !need.checked) need.checked = true;
+        if (changed === need && !need.checked && me.checked) me.checked = false;
+    });
+    ITEMS.forEach((i) => {
+        const req = i.ver.req, note = $(`[data-row="${i.key}"] .ck__req`);
+        if (!req) return;
+        note.hidden = false;
+        note.textContent = 'Requiere: ' + ITEMS.find((x) => x.key === req).t;
+    });
+}
 
 let shown = totalInicial;
 function animateTo(el, from, to) {
@@ -426,41 +475,71 @@ function animateTo(el, from, to) {
 }
 function recalc() {
     const sel = seleccion(), total = sel.total;
-    const lines = [...P.precios];
-    if (sel.bots.length) lines.push([`Bots de WhatsApp (${sel.bots.length} × ${bs0(P.bots.precio)})`, sel.bots.length * P.bots.precio, sel.bots.map((b) => b[0]).join(' · '), 'bot']);
-    if (sel.llamadas) lines.push(['Bot de llamadas con IA', P.llamadas.precio, 'Agente de voz para confirmaciones, recordatorios y atención 24/7', 'bot']);
-    if (sel.crm) lines.push(['CRM de pacientes y ventas', P.crm.precio, 'Pipelines, arrastrar y soltar, chat de WhatsApp en tiempo real, IA y derivación humana', 'bot']);
-    const pmax = Math.max(...lines.map((p) => p[1]));
-    html('#price-lines', lines.map(([t, v, d, tag], i) =>
-        `<div class="line${tag ? ' line--bot' : ''}"><span class="line__n">${String(i + 1).padStart(2, '0')}</span>
-         <div class="line__txt"><b>${esc(t)}</b>${d ? `<small>${esc(d)}</small>` : ''}<i class="line__bar" style="--w:${(v / pmax) * 100}%"></i></div>
-         <span class="line__v">${bs0(v)}</span></div>`).join(''));
-
-    $('#bot-count').textContent = `${sel.bots.length} bot${sel.bots.length === 1 ? '' : 's'} seleccionado${sel.bots.length === 1 ? '' : 's'}`;
-    $('#bot-sub').textContent = bs0(sel.bots.length * P.bots.precio);
-    $('.voice').classList.toggle('is-on', sel.llamadas);
-    $('.crm-offer').classList.toggle('is-on', sel.crm);
+    $$('.ck').forEach((r) => r.classList.toggle('is-on', box(r.dataset.row).checked));
+    GRUPOS.forEach((g) => {
+        const sub = ITEMS.filter((i) => i.g === g && box(i.key).checked).reduce((a, i) => a + i.v, 0);
+        $(`[data-sub="${g}"]`).textContent = sub ? bs0(sub) : 'Nada marcado';
+    });
 
     animateTo($('#sum-total'), shown, total); shown = total;
     const parts = [`${sel.bots.length} bot${sel.bots.length === 1 ? '' : 's'} de WhatsApp`];
     if (sel.llamadas) parts.push('bot de llamadas IA');
     if (sel.crm) parts.push('CRM');
-    if (sel.opcionales.length) parts.push(`${sel.opcionales.length} opcional${sel.opcionales.length > 1 ? 'es' : ''}`);
     $('#sum-note').textContent = 'Incluye ' + parts.join(' · ');
+    $('#sum-count').textContent = `${sel.items.length} de ${ITEMS.length} componentes marcados`;
     const iva = total * P.iva, it = total * P.it;
     $('#t-net').textContent = bs(total - iva - it);
     $('#t-iva').textContent = bs(iva);
     $('#t-it').textContent = bs(it);
     const montos = cuotas(total);
+    $('#mt-total').textContent = bs0(total);
+    $('#mt-cuota').textContent = `${P.cuotas.length} cuotas de ${bs0(montos[0])}`;
     $('#cuota-n').textContent = `${P.cuotas.length} cuotas mensuales de`;
     $('#cuota-v').textContent = bs(montos[0]);
     html('#cuotas', P.cuotas.map(([t, pct], i) =>
         `<article class="cuota reveal in" style="--p:${pct}"><header><span class="cuota__mes">Mes ${i + 1}</span><b>${bs(montos[i])}</b></header>
          <p>${esc(t)}</p><div class="cuota__bar"><i></i></div><small>Avance del proyecto: <strong>${pct} %</strong></small></article>`).join(''));
 }
-$$('[data-opt], [data-bot], #voice-opt, #crm-opt').forEach((c) => c.addEventListener('change', recalc));
+$$('[data-item]').forEach((c) => c.addEventListener('change', () => { dependencias(c); recalc(); }));
+$('#ck-rec').addEventListener('click', () => { ITEMS.forEach((i) => { box(i.key).checked = i.on; }); recalc(); });
+$('#ck-all').addEventListener('click', () => { ITEMS.forEach((i) => { box(i.key).checked = true; }); recalc(); });
+dependencias();
 $('#sum-total').textContent = bs(totalInicial);
 recalc();
+
+/* ---------- "Ver": ir a la explicación y volver a la lista ---------- */
+const backpill = $('#backpill');
+let volverA = null;
+function flash(el) {
+    if (!el) return;
+    el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+    setTimeout(() => el.classList.remove('flash'), 2200);
+}
+$$('[data-ver]').forEach((b) => b.addEventListener('click', () => {
+    const it = ITEMS.find((i) => i.key === b.dataset.ver), v = it.ver;
+    if (v.tab) showTab(v.tab);
+    if (v.sys) showSys(v.sys);
+    const dest = v.bot !== undefined ? $('#bot-' + v.bot) : v.tab ? $('.demo') : v.sys ? $('.arch') : $(v.ir);
+    volverA = b.closest('.ck');
+    dest.scrollIntoView({ behavior: reduced ? 'instant' : 'smooth', block: v.bot !== undefined || v.ir === '.voice' ? 'center' : 'start' });
+    setTimeout(() => flash(v.sys ? $('#sys-detail') : dest), 450);
+    backpill.hidden = false;
+    requestAnimationFrame(() => backpill.classList.add('is-on'));
+}));
+backpill.addEventListener('click', () => {
+    (volverA || $('#seleccion')).scrollIntoView({ behavior: reduced ? 'instant' : 'smooth', block: 'center' });
+    flash(volverA);
+    $('[data-item]', volverA || document)?.focus({ preventScroll: true });
+    hideBack();
+});
+function hideBack() { backpill.classList.remove('is-on'); setTimeout(() => { backpill.hidden = true; }, 300); }
+// en celular, barra fija con el total mientras se recorre la lista
+const mobtotal = $('#mobtotal');
+new IntersectionObserver((e) => mobtotal.classList.toggle('is-on', e[0].isIntersecting), { threshold: 0 }).observe($('#seleccion'));
+$('#mt-go').addEventListener('click', () => $('.price__sum').scrollIntoView({ behavior: reduced ? 'instant' : 'smooth', block: 'start' }));
+// al volver a la lista por cuenta propia, se oculta el botón
+new IntersectionObserver((e) => { if (e[0].isIntersecting && !backpill.hidden) hideBack(); }, { threshold: 0.35 }).observe($('#seleccion'));
+$$('.go-list').forEach((a) => a.addEventListener('click', () => setTimeout(() => flash($('#seleccion')), 500)));
 
 html('#plans', P.planes.map((p, i) =>
     `<article class="plan${p.destacado ? ' plan--hi' : ''} reveal" style="--d:${i * 80}ms">${p.destacado ? '<span class="plan__badge">Recomendado</span>' : ''}

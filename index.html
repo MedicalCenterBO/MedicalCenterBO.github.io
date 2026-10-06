@@ -47,7 +47,7 @@
             <a href="#bots">Bots</a>
             <a href="#crm">CRM</a>
             <a href="#cronograma">Cronograma</a>
-            <a href="#economica">Inversión</a>
+            <a href="#seleccion">Selección y total</a>
         </nav>
         <button class="btn btn--dark btn--sm" id="btn-pdf" type="button">
             <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -321,7 +321,7 @@
         <header class="sec__head reveal">
             <span class="sec__num">05</span>
             <div><h2>Bots de WhatsApp y llamadas con IA</h2>
-            <p class="sec__sub">Cada bot de WhatsApp es un flujo independiente, con su propio objetivo y un <strong>precio fijo</strong>. La plataforma común (conexión con WhatsApp Cloud API, validación de identidad, notificaciones y enlaces seguros) se cotiza una sola vez. Elija los bots que necesita y el total se actualiza en la propuesta económica.</p></div>
+            <p class="sec__sub">Cada bot de WhatsApp es un flujo independiente, con su propio objetivo y un <strong>precio fijo</strong>. La plataforma común (conexión con WhatsApp Cloud API, validación de identidad, notificaciones y enlaces seguros) se cotiza una sola vez. Los bots que desee se marcan en la lista de selección, al final de la propuesta.</p></div>
         </header>
         <div class="bots">
             <div class="bots__wa reveal">
@@ -330,7 +330,7 @@
                     <div class="bots__unit"><b id="bot-unit"></b><small>por bot</small></div>
                 </div>
                 <div class="botgrid" id="bot-grid"></div>
-                <div class="bots__foot"><span id="bot-count"></span><b id="bot-sub"></b></div>
+                <div class="bots__foot"><span>Precio fijo por cada bot que se contrate</span><a href="#seleccion" class="go-list">Elegir en la lista final ↓</a></div>
             </div>
             <div class="voice reveal">
                 <p class="kicker kicker--light"><span class="dot"></span> Llamadas con IA</p>
@@ -343,7 +343,7 @@
                     <p class="voice__line"><span>IA</span>“Hola María, le llamo de MedicalCenter para confirmar su cita de mañana a las 9:30. ¿Desea confirmarla?”</p>
                 </div>
                 <ul class="voice__list" id="voice-list"></ul>
-                <label class="voice__toggle"><input type="checkbox" id="voice-opt"><span class="switch" aria-hidden="true"></span><span>Incluir en la propuesta</span><b id="voice-price"></b></label>
+                <div class="voice__foot"><div><b id="voice-price"></b><small>pago único, impuestos incluidos</small></div><a href="#seleccion" class="go-list go-list--light">Elegir en la lista final ↓</a></div>
             </div>
         </div>
     </div>
@@ -366,17 +366,39 @@
 
         <div class="crm-demo reveal">
             <div class="crm-demo__intro">
-                <h3>Pruébelo: arrastre las oportunidades por el embudo</h3>
-                <p>Cambie de pipeline, arrastre una tarjeta a otra etapa y ábrala para ver el contacto, las notas y el chat de WhatsApp en vivo. <span class="muted">En celular, mantenga presionada la tarjeta para arrastrarla.</span></p>
+                <h3>Pruébelo: el embudo y el calendario de citas</h3>
+                <p>En <b>Embudo</b>, arrastre una tarjeta a otra etapa y ábrala para ver el contacto, las notas y el chat de WhatsApp en vivo. En <b>Calendario</b>, revise las citas agendadas y pregúntele a la IA por cupos, médicos o pacientes. <span class="muted">En celular, mantenga presionada la tarjeta para arrastrarla.</span></p>
             </div>
             <div class="crm">
                 <div class="crm__bar">
                     <div class="crm__brand"><span class="crm__logo">CRM</span><b>MedicalCenter</b></div>
+                    <div class="crm__views" role="tablist" aria-label="Vista del CRM">
+                        <button role="tab" aria-selected="true" data-view="board">Embudo</button>
+                        <button role="tab" aria-selected="false" data-view="cal">Calendario</button>
+                    </div>
                     <div class="crm__pipes" role="tablist" aria-label="Pipelines" id="crm-pipes"></div>
-                    <div class="crm__stats"><div><small>Valor del embudo</small><b id="crm-value"></b></div><div><small>Conversión</small><b id="crm-conv"></b></div></div>
+                    <div class="crm__stats" id="crm-stats-board"><div><small>Valor del embudo</small><b id="crm-value"></b></div><div><small>Conversión</small><b id="crm-conv"></b></div></div>
+                    <div class="crm__stats" id="crm-stats-cal" hidden><div><small>Citas en la semana</small><b id="cal-count"></b></div><div><small>Por confirmar</small><b id="cal-pend"></b></div></div>
                 </div>
                 <div class="crm__board" id="crm-board"></div>
                 <div class="crm__funnel" id="crm-funnel" aria-label="Embudo de conversión"></div>
+
+                <div class="cal" id="crm-cal" hidden>
+                    <div class="cal__main">
+                        <div class="cal__bar">
+                            <div class="cal__nav"><button class="mini" type="button" id="cal-prev" aria-label="Semana anterior">‹</button><b id="cal-week"></b><button class="mini" type="button" id="cal-next" aria-label="Semana siguiente">›</button></div>
+                            <div class="cal__filters" id="cal-filters" role="group" aria-label="Filtrar por especialidad"></div>
+                        </div>
+                        <div class="cal__scroll"><div class="cal__grid" id="cal-grid"></div></div>
+                        <div class="cal__detail" id="cal-detail" aria-live="polite"><p class="muted">Seleccione una cita para ver el detalle.</p></div>
+                    </div>
+                    <aside class="cal__ai">
+                        <div class="cal__ai-head"><span class="cal__ai-ico">IA</span><div><b>Asistente IA</b><small>Consulta el calendario en tiempo real</small></div></div>
+                        <div class="cal__chat" id="cal-chat"></div>
+                        <div class="cal__chips" id="cal-chips"></div>
+                        <form class="chatin" id="cal-form"><input id="cal-input" autocomplete="off" placeholder="Pregunte por cupos, médicos o pacientes…" aria-label="Pregunta para la IA"><button class="mini mini--solid" type="submit">Preguntar</button></form>
+                    </aside>
+                </div>
 
                 <aside class="drawer" id="crm-drawer" aria-hidden="true">
                     <header class="drawer__head">
@@ -423,7 +445,7 @@
             <div class="crm-offer__price">
                 <b id="crm-price"></b>
                 <small>pago único, impuestos incluidos</small>
-                <label class="voice__toggle"><input type="checkbox" id="crm-opt"><span class="switch" aria-hidden="true"></span><span>Incluir en la propuesta</span></label>
+                <a href="#seleccion" class="go-list go-list--light">Agregar en la lista final ↓</a>
             </div>
         </div>
     </div>
@@ -542,15 +564,20 @@
         <header class="sec__head reveal">
             <span class="sec__num">13</span>
             <div><h2>Propuesta económica</h2>
-            <p class="sec__sub">En bolivianos, llave en mano, con <strong>impuestos de ley incluidos</strong> y factura. Incluye código fuente, derechos de uso y modificación, documentación, capacitación y garantía. Elija los bots en la sección 05 y el total se actualiza al instante.</p></div>
+            <p class="sec__sub">En bolivianos, llave en mano, con <strong>impuestos de ley incluidos</strong> y factura. Incluye código fuente, derechos de uso y modificación, documentación, capacitación y garantía. Marque en la lista los componentes que desea contratar y el total, los impuestos y las cuotas se calculan al instante.</p></div>
         </header>
 
         <div class="price">
-            <div class="price__list reveal">
-                <div class="lines" id="price-lines"></div>
-                <p class="price__hint">Los bots de WhatsApp y el bot de llamadas se eligen en la <a href="#bots">sección 05</a>, y el CRM en la <a href="#crm">sección 06</a>.</p>
-                <p class="h4" id="opt-title">Componentes opcionales</p>
-                <div id="optionals"></div>
+            <div class="checklist reveal" id="seleccion">
+                <div class="checklist__head">
+                    <div><h3>Lista de selección</h3>
+                    <p>Marque lo que desea contratar. Si tiene dudas sobre un punto, toque <b>Ver</b> para leer su explicación y luego vuelva aquí con un clic.</p></div>
+                    <div class="checklist__acts" role="group" aria-label="Selección rápida">
+                        <button class="mini" type="button" id="ck-rec">Recomendado</button>
+                        <button class="mini" type="button" id="ck-all">Marcar todo</button>
+                    </div>
+                </div>
+                <div id="checklist"></div>
             </div>
 
             <aside class="price__sum reveal">
@@ -558,6 +585,7 @@
                     <p class="sum__label">Total de la inversión</p>
                     <p class="sum__total" id="sum-total"></p>
                     <p class="sum__note" id="sum-note"></p>
+                    <p class="sum__count" id="sum-count"></p>
                     <dl class="sum__tax">
                         <div><dt>Importe neto</dt><dd id="t-net"></dd></div>
                         <div><dt>IVA 13 % incluido</dt><dd id="t-iva"></dd></div>
@@ -596,6 +624,16 @@
 </section>
 
 </main>
+
+<div class="mobtotal" id="mobtotal" aria-hidden="true">
+    <div><small>Total</small><b id="mt-total"></b><span id="mt-cuota"></span></div>
+    <button type="button" id="mt-go" tabindex="-1">Ver detalle</button>
+</div>
+
+<button class="backpill" id="backpill" type="button" hidden>
+    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 19V5m0 0l-6 6m6-6l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Volver a la lista de selección
+</button>
 
 <footer class="foot">
     <div class="wrap foot__in">

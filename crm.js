@@ -108,7 +108,6 @@ $$('#crm-pipes button').forEach((b) => b.addEventListener('click', () => {
     $$('#crm-pipes button').forEach((x) => x.setAttribute('aria-selected', x === b));
     closeDrawer();
     render(true);
-$$('#crm .reveal:not(.in)').forEach((el) => io.observe(el));
 }));
 
 function render(animate = false) {
@@ -362,6 +361,153 @@ function scheduleLive(d) {
         });
     }, 2200));
 }
+
+/* ---------- vista: embudo / calendario ---------- */
+$$('.crm__views button').forEach((b) => b.addEventListener('click', () => {
+    const cal = b.dataset.view === 'cal';
+    $$('.crm__views button').forEach((x) => x.setAttribute('aria-selected', x === b));
+    closeDrawer();
+    $('#crm-pipes').hidden = cal;
+    $('#crm-stats-board').hidden = cal;
+    $('#crm-stats-cal').hidden = !cal;
+    board.hidden = cal;
+    $('#crm-funnel').hidden = cal;
+    $('#crm-cal').hidden = !cal;
+    if (cal) renderCal();
+}));
+
+/* ---------- calendario de citas ---------- */
+const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+const HORAS = [8, 9, 10, 11, 12, 14, 15, 16];
+const ESP = {
+    'Neurología': { dr: 'Dr. R. Salvatierra', h: 152 },
+    'Cardiología': { dr: 'Dra. M. Céspedes', h: 352 },
+    'Pediatría': { dr: 'Dr. J. Arteaga', h: 205 },
+    'Imagenología': { dr: 'Resonancia / Tomografía', h: 265 },
+};
+const PACIENTES = ['Carla Méndez', 'Jorge Rivero', 'Lucía Fernández', 'Marco Antelo', 'Sofía Pinto', 'Diego Rojas', 'Valeria Suárez', 'Roberto Vargas', 'Ana Justiniano', 'Luis Vaca', 'María Rojas', 'Juan Pérez', 'Paola Ribera', 'Miguel Ortiz', 'Daniela Saucedo', 'Carlos Áñez', 'Gabriela Roca', 'Andrés Salazar'];
+const CANAL = ['WhatsApp (IA)', 'Portal', 'Llamada (IA)', 'Recepción'];
+const LUNES = new Date(2026, 9, 5); // semana del lunes 5 de octubre de 2026
+let semana = 0, filtro = 'Todas', citaSel = null;
+
+// citas deterministas por semana (misma semilla, mismos datos)
+function citasDe(w) {
+    let seed = 7 + w * 13;
+    const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
+    const out = [];
+    DIAS.forEach((_, d) => HORAS.forEach((h) => {
+        if (d === 5 && h > 12) return; // sábado solo mañana
+        Object.keys(ESP).forEach((e) => {
+            if (rnd() < 0.2) {
+                const pac = PACIENTES[Math.floor(rnd() * PACIENTES.length)];
+                const r = rnd();
+                const est = w < 0 ? 'Atendida' : w === 0 && d === 0 && h < 12 ? 'Atendida' : r < 0.22 ? 'Pendiente' : 'Confirmada';
+                out.push({ id: `${w}-${d}-${h}-${e}`, d, h, e, pac, dr: ESP[e].dr, est, canal: CANAL[Math.floor(rnd() * CANAL.length)] });
+            }
+        });
+    }));
+    // cita fija para la demo de la IA
+    if (w === 0 && !out.some((c) => c.pac === 'Carla Méndez')) out.push({ id: 'fija', d: 3, h: 9, e: 'Neurología', pac: 'Carla Méndez', dr: ESP['Neurología'].dr, est: 'Confirmada', canal: 'WhatsApp (IA)' });
+    return out;
+}
+const fecha = (w, d) => { const f = new Date(LUNES); f.setDate(f.getDate() + w * 7 + d); return f; };
+const fmtDia = (f) => `${f.getDate()} ${['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'][f.getMonth()]}`;
+const hh = (h) => `${String(h).padStart(2, '0')}:00`;
+
+html('#cal-filters', ['Todas', ...Object.keys(ESP)].map((e) =>
+    `<button type="button" class="chip${e === filtro ? ' is-on' : ''}" data-esp="${e}">${e !== 'Todas' ? `<span class="cal__dot" style="--h:${ESP[e].h}"></span>` : ''}${e}</button>`).join(''));
+$$('#cal-filters .chip').forEach((b) => b.addEventListener('click', () => {
+    filtro = b.dataset.esp;
+    $$('#cal-filters .chip').forEach((x) => x.classList.toggle('is-on', x === b));
+    renderCal();
+}));
+$('#cal-prev').addEventListener('click', () => { if (semana > -1) { semana--; citaSel = null; renderCal(); } });
+$('#cal-next').addEventListener('click', () => { if (semana < 2) { semana++; citaSel = null; renderCal(); } });
+
+function renderCal() {
+    const citas = citasDe(semana).filter((c) => filtro === 'Todas' || c.e === filtro);
+    $('#cal-week').textContent = `Semana del ${fmtDia(fecha(semana, 0))} al ${fmtDia(fecha(semana, 5))}`;
+    $('#cal-prev').disabled = semana <= -1;
+    $('#cal-next').disabled = semana >= 2;
+    $('#cal-count').textContent = citas.length;
+    $('#cal-pend').textContent = citas.filter((c) => c.est === 'Pendiente').length;
+    let g = '<div class="cal__corner"></div>' + DIAS.map((d, i) =>
+        `<div class="cal__day${semana === 0 && i === 0 ? ' is-today' : ''}"><b>${d.slice(0, 3)}</b><small>${fmtDia(fecha(semana, i))}</small></div>`).join('');
+    HORAS.forEach((h) => {
+        g += `<div class="cal__hour">${hh(h)}</div>`;
+        DIAS.forEach((_, d) => {
+            const cell = citas.filter((c) => c.d === d && c.h === h);
+            const off = d === 5 && h > 12;
+            g += `<div class="cal__cell${off ? ' is-off' : ''}">${cell.map((c) =>
+                `<button type="button" class="appt2 appt2--${c.est.toLowerCase()}${citaSel === c.id ? ' is-sel' : ''}" style="--h:${ESP[c.e].h}" data-cita="${c.id}" title="${esc(c.pac)} · ${esc(c.e)}">
+                    <b>${esc(c.pac)}</b><small>${esc(c.e)}</small></button>`).join('')}</div>`;
+        });
+    });
+    html('#cal-grid', g);
+    $$('[data-cita]').forEach((b) => b.addEventListener('click', () => { citaSel = b.dataset.cita; renderCal(); }));
+    const c = citasDe(semana).find((x) => x.id === citaSel);
+    html('#cal-detail', c ? `<div class="cal__det">
+        <span class="cal__dot cal__dot--lg" style="--h:${ESP[c.e].h}"></span>
+        <div><b>${esc(c.pac)}</b><small>${esc(c.e)} · ${esc(c.dr)}</small></div>
+        <dl><div><dt>Fecha</dt><dd>${DIAS[c.d]} ${fmtDia(fecha(semana, c.d))}, ${hh(c.h)}</dd></div>
+            <div><dt>Estado</dt><dd><span class="pill ${c.est === 'Pendiente' ? 'pill--wait' : c.est === 'Atendida' ? 'pill--mute' : 'pill--ok'}">${c.est}</span></dd></div>
+            <div><dt>Agendada por</dt><dd>${esc(c.canal)}</dd></div></dl></div>` : '<p class="muted">Seleccione una cita para ver el detalle.</p>');
+}
+
+/* ---------- la IA consulta el calendario ---------- */
+const PREGUNTAS = [
+    '¿Qué cupos libres hay el jueves en Neurología?',
+    '¿Cuántas citas tiene la Dra. Céspedes esta semana?',
+    '¿Cuál es la próxima cita de Carla Méndez?',
+    '¿Qué citas están pendientes de confirmar?',
+];
+html('#cal-chips', PREGUNTAS.map((q) => `<button type="button" class="cal__chip">${esc(q)}</button>`).join(''));
+const calChat = $('#cal-chat');
+const calMsg = (cls, t) => { calChat.insertAdjacentHTML('beforeend', `<p class="cm ${cls}">${cls.includes('ia') ? '<span class="cm__tag">IA</span>' : ''}${t}</p>`); calChat.scrollTop = calChat.scrollHeight; };
+calMsg('cm--in cm--ia', 'Hola 👋 Tengo acceso al calendario de citas. Pregúnteme por cupos, médicos o pacientes.');
+
+function responder(q) {
+    const t = q.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    const citas = citasDe(0);
+    const dia = DIAS.findIndex((d) => t.includes(d.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')));
+    const esp = Object.keys(ESP).find((e) => t.includes(e.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').slice(0, 6)));
+    const pac = PACIENTES.find((p) => new RegExp(`\\b${p.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').split(' ')[0]}\\b`).test(t));
+    const drKey = Object.keys(ESP).find((e) => { const ap = ESP[e].dr.split(' ').pop().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); return ap.length > 3 && t.includes(ap); });
+
+    if (/(cupo|libre|disponib|espacio)/.test(t)) {
+        const d = dia >= 0 ? dia : 3, e = esp || 'Neurología';
+        const ocupadas = citas.filter((c) => c.d === d && c.e === e).map((c) => c.h);
+        const libres = HORAS.filter((h) => !(d === 5 && h > 12) && !ocupadas.includes(h));
+        return libres.length
+            ? `El <b>${DIAS[d].toLowerCase()} ${fmtDia(fecha(0, d))}</b> en <b>${e}</b> (${ESP[e].dr}) hay ${libres.length} cupos libres: <b>${libres.map(hh).join(', ')}</b>. ¿Desea que reserve alguno?`
+            : `El ${DIAS[d].toLowerCase()} no quedan cupos en ${e}. ¿Busco el día siguiente?`;
+    }
+    if (/(pendiente|confirmar)/.test(t)) {
+        const p = citas.filter((c) => c.est === 'Pendiente');
+        return p.length
+            ? `Hay <b>${p.length} citas por confirmar</b> esta semana:<br>${p.slice(0, 5).map((c) => `• ${esc(c.pac)} · ${c.e} · ${DIAS[c.d]} ${hh(c.h)}`).join('<br>')}${p.length > 5 ? '<br>…' : ''}<br>Puedo enviarles un recordatorio por WhatsApp.`
+            : 'No hay citas pendientes de confirmar esta semana. ✅';
+    }
+    if (drKey || /(dr\.|dra\.|doctor|medico)/.test(t) && esp) {
+        const e = drKey || esp, list = citas.filter((c) => c.e === e);
+        return `${ESP[e].dr} tiene <b>${list.length} citas</b> esta semana: ${DIAS.map((d, i) => [d, list.filter((c) => c.d === i).length]).filter(([, n]) => n).map(([d, n]) => `${d.toLowerCase()} ${n}`).join(', ')}.`;
+    }
+    if (pac) {
+        const prox = [0, 1, 2].flatMap((w) => citasDe(w).filter((c) => c.pac === pac && c.est !== 'Atendida').map((c) => ({ ...c, w })))[0];
+        return prox
+            ? `La próxima cita de <b>${esc(pac)}</b> es el <b>${DIAS[prox.d].toLowerCase()} ${fmtDia(fecha(prox.w, prox.d))} a las ${hh(prox.h)}</b>, ${prox.e} con ${prox.dr}. Estado: ${prox.est.toLowerCase()}.`
+            : `${esc(pac)} no tiene citas próximas agendadas. ¿Desea que le busque un horario?`;
+    }
+    return 'Puedo consultar <b>cupos libres</b> por día y especialidad, <b>citas por médico</b>, la <b>próxima cita de un paciente</b> o las <b>citas pendientes</b>. Pruebe con una de las preguntas sugeridas.';
+}
+function preguntar(q) {
+    if (!q.trim()) return;
+    calMsg('cm--out', esc(q));
+    calChat.insertAdjacentHTML('beforeend', '<p class="cm cm--in cm--typing"><i></i><i></i><i></i></p>'); calChat.scrollTop = calChat.scrollHeight;
+    setTimeout(() => { $('#cal-chat .cm--typing')?.remove(); calMsg('cm--in cm--ia', responder(q)); }, reduced ? 0 : 900);
+}
+$$('.cal__chip').forEach((b) => b.addEventListener('click', () => preguntar(b.textContent)));
+$('#cal-form').addEventListener('submit', (e) => { e.preventDefault(); preguntar($('#cal-input').value); $('#cal-input').value = ''; });
 
 render(true);
 $$('#crm .reveal:not(.in)').forEach((el) => io.observe(el));
