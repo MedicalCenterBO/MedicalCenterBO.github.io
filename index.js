@@ -43,7 +43,7 @@ const PROPUESTA = {
         'Medicaltec': { rol: 'Fuente principal de pacientes, agendas y ventas',
             ops: ['Búsqueda y vinculación de pacientes sin duplicados', 'Especialidades, médicos, sedes, servicios y tarifas', 'Agendas, cupos, bloqueos y disponibilidad', 'Reserva, reprogramación, confirmación y cancelación', 'Registro de ventas y transacciones pagadas', 'Órdenes de laboratorio (puente hacia Interlab)'] },
         'Radoffice': { rol: 'Resultados de imagenología',
-            ops: ['Listado de estudios validados del paciente', 'Visualización y descarga de informes', 'Acceso a imágenes por visor o enlace seguro temporal', 'Verificación de que el paciente es el titular del estudio'] },
+            ops: ['Consulta HTTP a Radoffice que devuelve el enlace del estudio', 'Informe e imágenes mostrados en un visor embebido (iframe) dentro del portal', 'Solo estudios validados y habilitados para entrega', 'Verificación de que el paciente es el titular del estudio'] },
         'Interlab': { rol: 'Resultados de laboratorio a través de Medicaltec',
             ops: ['Órdenes y resultados disponibles', 'Visualización y descarga de informes', 'Fechas, exámenes y estados', 'Solo resultados validados y autorizados'] },
         'SBA': { rol: 'Facturación electrónica',
@@ -66,6 +66,7 @@ const PROPUESTA = {
         ['Radoffice e Interlab', 8, 10],
         ['Pagos QR y facturación SBA', 9, 12],
         ['Bots de WhatsApp y de llamadas', 9, 13],
+        ['CRM (si se contrata)', 10, 14],
         ['Ajustes y validación con MedicalCenter', 12, 14],
         ['Puesta en producción', 14, 15],
         ['Capacitación TI y acompañamiento', 15, 16],
@@ -95,7 +96,7 @@ const PROPUESTA = {
         ['3.3', 'Agendas médicas sin sobreasignación', 'ok', 'Reserva temporal del cupo y confirmación en Medicaltec.'],
         ['3.4', 'Módulo administrativo', 'ok', 'Cumple.'],
         ['4', 'Integración con Medicaltec por servicios autorizados', 'dep', 'Sin escritura directa en la base de datos. Se entrega la matriz de operaciones.'],
-        ['5', 'Integración con Radoffice', 'dep', 'El visor de imágenes depende de la capacidad de Radoffice.'],
+        ['5', 'Integración con Radoffice', 'dep', 'Radoffice devuelve por HTTP el enlace del estudio, que el portal muestra en un visor embebido.'],
         ['6', 'Integración con Interlab a través de Medicaltec', 'dep', 'Depende de la disponibilidad de resultados vía Medicaltec.'],
         ['7', 'Bots de WhatsApp', 'dep', 'Sobre la cuenta de WhatsApp Business de MedicalCenter; plantillas sujetas a aprobación de Meta.'],
         ['8', 'Pagos mediante QR', 'dep', 'Pago con QR. Requiere convenio y API del banco que elija MedicalCenter. El pago con tarjeta no está incluido.'],
@@ -136,7 +137,7 @@ const PROPUESTA = {
         ['Portal de médicos', 15000, 'Agenda, bloqueos, cupos y estados'],
         ['Módulo administrativo', 18000, 'Roles, parámetros, transacciones, auditoría y conciliación'],
         ['Integración Medicaltec', 17000, 'Conectores, reintentos, concurrencia y matriz de operaciones'],
-        ['Integración Radoffice', 8000, 'Estudios, informes y enlaces seguros'],
+        ['Integración Radoffice', 4000, 'Consulta HTTP que devuelve el enlace del estudio, mostrado en un visor embebido'],
         ['Integración Interlab vía Medicaltec', 7000],
         ['Pagos QR', 10000, 'Banco/pasarela, estados y conciliación'],
         ['Facturación electrónica SBA', 10000],
@@ -172,6 +173,38 @@ const PROPUESTA = {
     },
 
     opcionales: [],
+
+    // CRM de pacientes y ventas (módulo ofrecido como opcional)
+    crm: {
+        precio: 45000,
+        queEs: 'Un CRM (gestión de la relación con pacientes) reúne en un solo lugar a cada persona que escribe por WhatsApp, llama o consulta en el portal, y convierte cada consulta en una oportunidad con dueño, etapa, valor y seguimiento hasta que se transforma en una cita, un estudio o una cirugía agendada.',
+        porQue: [
+            ['Consultas que se pierden', 'Hoy las conversaciones de WhatsApp quedan dispersas en celulares y chats individuales, sin seguimiento ni historial compartido.'],
+            ['Sin visibilidad del embudo', 'No se sabe cuántas personas consultaron, cuántas recibieron precio y cuántas terminaron agendando.'],
+            ['Seguimiento manual', 'Presupuestos de cirugías, chequeos y convenios dependen de la memoria de cada asesor.'],
+            ['Respuesta lenta fuera de horario', 'Un paciente que escribe de noche espera hasta el día siguiente y muchas veces se va con otra clínica.'],
+        ],
+        pasos: [
+            ['Llega el contacto', 'Un paciente escribe por WhatsApp, llama o deja sus datos en el portal. Se crea la oportunidad automáticamente.'],
+            ['Atiende la IA', 'El asistente responde al instante, informa precios y horarios, califica el interés y agenda si el paciente lo desea.'],
+            ['Derivación humana', 'Si el paciente prefiere hablar con una persona, o la IA lo considera necesario, la conversación pasa a un asesor con todo el historial.'],
+            ['Seguimiento en el embudo', 'El asesor arrastra la oportunidad por las etapas, agrega notas y responde por WhatsApp desde la misma ficha.'],
+            ['Cierre', 'La cita, el estudio o la cirugía quedan registrados en Medicaltec y el CRM mide la conversión por canal y por asesor.'],
+        ],
+        funciones: [
+            ['Pipelines parametrizables', 'Embudos ilimitados (consultas, cirugías, chequeos, convenios con empresas) con etapas, colores y reglas propias.'],
+            ['Arrastrar y soltar', 'Las oportunidades se mueven entre etapas arrastrándolas; el valor de cada etapa se recalcula al instante.'],
+            ['Chat de WhatsApp en tiempo real', 'Cada oportunidad muestra la conversación en vivo y permite responder desde el CRM.'],
+            ['Atención por IA y derivación humana', 'La IA atiende 24/7 y, con un clic o a pedido del paciente, un asesor toma la conversación.'],
+            ['Notas y ficha de contacto', 'Notas internas, datos de contacto, paciente vinculado en Medicaltec e historial de citas.'],
+            ['Asignación y reportes', 'Reparto de oportunidades por asesor, tareas de seguimiento y reportes de conversión del embudo.'],
+        ],
+        pipelines: {
+            'Consultas': ['Nuevo', 'Atendido por IA', 'Con asesor', 'Cotizado', 'Agendado'],
+            'Cirugías': ['Interesado', 'Evaluación médica', 'Presupuesto enviado', 'Negociación', 'Programada'],
+            'Empresas': ['Prospecto', 'Contactado', 'Propuesta', 'Negociación', 'Convenio firmado'],
+        },
+    },
 
     // Una cuota igual por mes, pagada contra la demostración del avance del mes.
     // [entregable demostrado, avance acumulado del proyecto en %]
@@ -224,9 +257,10 @@ const totalInicial = base + P.bots.tipos.filter((b) => b[3]).length * P.bots.pre
 function seleccion() {
     const bots = $$('[data-bot]').filter((c) => c.checked).map((c) => P.bots.tipos[c.dataset.bot]);
     const llamadas = $('#voice-opt').checked;
+    const crm = $('#crm-opt').checked;
     const opcionales = $$('[data-opt]').filter((c) => c.checked).map((c) => P.opcionales[c.dataset.opt]);
-    const total = base + bots.length * P.bots.precio + (llamadas ? P.llamadas.precio : 0) + opcionales.reduce((a, o) => a + o[2], 0);
-    return { bots, llamadas, opcionales, total };
+    const total = base + bots.length * P.bots.precio + (llamadas ? P.llamadas.precio : 0) + (crm ? P.crm.precio : 0) + opcionales.reduce((a, o) => a + o[2], 0);
+    return { bots, llamadas, crm, opcionales, total };
 }
 
 /* ---------- datos enlazados ---------- */
@@ -241,7 +275,7 @@ function countUp(el) {
     if (reduced) { el.textContent = fmt(target); return; }
     const t0 = performance.now(), dur = 1400;
     const step = (t) => {
-        const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+        const k = Math.max(0, Math.min(1, (t - t0) / dur)), e = 1 - Math.pow(1 - k, 3);
         el.textContent = fmt(target * e);
         if (k < 1) requestAnimationFrame(step);
     };
@@ -383,17 +417,19 @@ function animateTo(el, from, to) {
     if (reduced) { el.textContent = bs(to); return; }
     const t0 = performance.now();
     const step = (t) => {
-        const k = Math.min(1, (t - t0) / 500), e = 1 - Math.pow(1 - k, 3);
+        const k = Math.max(0, Math.min(1, (t - t0) / 500)), e = 1 - Math.pow(1 - k, 3);
         el.textContent = bs(from + (to - from) * e);
         if (k < 1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
+    clearTimeout(el._fin); el._fin = setTimeout(() => { el.textContent = bs(to); }, 600);
 }
 function recalc() {
     const sel = seleccion(), total = sel.total;
     const lines = [...P.precios];
     if (sel.bots.length) lines.push([`Bots de WhatsApp (${sel.bots.length} × ${bs0(P.bots.precio)})`, sel.bots.length * P.bots.precio, sel.bots.map((b) => b[0]).join(' · '), 'bot']);
     if (sel.llamadas) lines.push(['Bot de llamadas con IA', P.llamadas.precio, 'Agente de voz para confirmaciones, recordatorios y atención 24/7', 'bot']);
+    if (sel.crm) lines.push(['CRM de pacientes y ventas', P.crm.precio, 'Pipelines, arrastrar y soltar, chat de WhatsApp en tiempo real, IA y derivación humana', 'bot']);
     const pmax = Math.max(...lines.map((p) => p[1]));
     html('#price-lines', lines.map(([t, v, d, tag], i) =>
         `<div class="line${tag ? ' line--bot' : ''}"><span class="line__n">${String(i + 1).padStart(2, '0')}</span>
@@ -403,10 +439,12 @@ function recalc() {
     $('#bot-count').textContent = `${sel.bots.length} bot${sel.bots.length === 1 ? '' : 's'} seleccionado${sel.bots.length === 1 ? '' : 's'}`;
     $('#bot-sub').textContent = bs0(sel.bots.length * P.bots.precio);
     $('.voice').classList.toggle('is-on', sel.llamadas);
+    $('.crm-offer').classList.toggle('is-on', sel.crm);
 
     animateTo($('#sum-total'), shown, total); shown = total;
     const parts = [`${sel.bots.length} bot${sel.bots.length === 1 ? '' : 's'} de WhatsApp`];
     if (sel.llamadas) parts.push('bot de llamadas IA');
+    if (sel.crm) parts.push('CRM');
     if (sel.opcionales.length) parts.push(`${sel.opcionales.length} opcional${sel.opcionales.length > 1 ? 'es' : ''}`);
     $('#sum-note').textContent = 'Incluye ' + parts.join(' · ');
     const iva = total * P.iva, it = total * P.it;
@@ -420,7 +458,7 @@ function recalc() {
         `<article class="cuota reveal in" style="--p:${pct}"><header><span class="cuota__mes">Mes ${i + 1}</span><b>${bs(montos[i])}</b></header>
          <p>${esc(t)}</p><div class="cuota__bar"><i></i></div><small>Avance del proyecto: <strong>${pct} %</strong></small></article>`).join(''));
 }
-$$('[data-opt], [data-bot], #voice-opt').forEach((c) => c.addEventListener('change', recalc));
+$$('[data-opt], [data-bot], #voice-opt, #crm-opt').forEach((c) => c.addEventListener('change', recalc));
 $('#sum-total').textContent = bs(totalInicial);
 recalc();
 

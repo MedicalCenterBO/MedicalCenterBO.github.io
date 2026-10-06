@@ -6,6 +6,27 @@
     <title>Propuesta · Portal de Autogestión y Bots WhatsApp · Clínica MedicalCenter</title>
     <meta name="description" content="Propuesta técnica y económica para el Portal de Autogestión de pacientes y médicos, e integración de bots de WhatsApp para Clínica MedicalCenter.">
     <link rel="icon" href="https://medicalcenter.bo/wp-content/uploads/2021/05/cropped-logo-32x32.png">
+    <link rel="canonical" href="https://medicalcenterbo.github.io/">
+    <meta name="theme-color" content="#0b3b2e">
+
+    <!-- Vista previa al compartir (WhatsApp, Facebook, LinkedIn, Telegram) -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Servisofts S.R.L.">
+    <meta property="og:locale" content="es_BO">
+    <meta property="og:url" content="https://medicalcenterbo.github.io/">
+    <meta property="og:title" content="Propuesta para Clínica MedicalCenter · Portal de Autogestión, bots de WhatsApp y CRM">
+    <meta property="og:description" content="Citas, pagos QR, resultados de laboratorio e imagenología, bots de WhatsApp con IA, llamadas con IA y CRM. Propuesta técnica y económica de Servisofts S.R.L.">
+    <meta property="og:image" content="https://medicalcenterbo.github.io/assets/og-image.jpg">
+    <meta property="og:image:secure_url" content="https://medicalcenterbo.github.io/assets/og-image.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Propuesta de Servisofts S.R.L. para Clínica MedicalCenter: Portal de Autogestión, bots de WhatsApp y CRM">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Propuesta para Clínica MedicalCenter · Portal de Autogestión, bots de WhatsApp y CRM">
+    <meta name="twitter:description" content="Citas, pagos QR, resultados, bots de WhatsApp con IA, llamadas con IA y CRM.">
+    <meta name="twitter:image" content="https://medicalcenterbo.github.io/assets/og-image.jpg">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&display=swap" rel="stylesheet">
@@ -24,6 +45,7 @@
             <a href="#portal">Portal</a>
             <a href="#arquitectura">Arquitectura</a>
             <a href="#bots">Bots</a>
+            <a href="#crm">CRM</a>
             <a href="#cronograma">Cronograma</a>
             <a href="#economica">Inversión</a>
         </nav>
@@ -327,11 +349,91 @@
     </div>
 </section>
 
-<!-- 06 INFRAESTRUCTURA -->
-<section class="sec sec--tint" id="infraestructura">
+<!-- 06 CRM -->
+<section class="sec sec--crm" id="crm">
     <div class="wrap">
         <header class="sec__head reveal">
             <span class="sec__num">06</span>
+            <div><p class="kicker">Módulo adicional</p><h2>CRM de pacientes y ventas</h2>
+            <p class="sec__sub" id="crm-que"></p></div>
+        </header>
+
+        <h3 class="h3 reveal">¿Por qué MedicalCenter lo necesita?</h3>
+        <div class="pains" id="crm-pains"></div>
+
+        <h3 class="h3 reveal">Cómo funciona</h3>
+        <ol class="flow reveal" id="crm-flow"></ol>
+
+        <div class="crm-demo reveal">
+            <div class="crm-demo__intro">
+                <h3>Pruébelo: arrastre las oportunidades por el embudo</h3>
+                <p>Cambie de pipeline, arrastre una tarjeta a otra etapa y ábrala para ver el contacto, las notas y el chat de WhatsApp en vivo. <span class="muted">En celular, mantenga presionada la tarjeta para arrastrarla.</span></p>
+            </div>
+            <div class="crm">
+                <div class="crm__bar">
+                    <div class="crm__brand"><span class="crm__logo">CRM</span><b>MedicalCenter</b></div>
+                    <div class="crm__pipes" role="tablist" aria-label="Pipelines" id="crm-pipes"></div>
+                    <div class="crm__stats"><div><small>Valor del embudo</small><b id="crm-value"></b></div><div><small>Conversión</small><b id="crm-conv"></b></div></div>
+                </div>
+                <div class="crm__board" id="crm-board"></div>
+                <div class="crm__funnel" id="crm-funnel" aria-label="Embudo de conversión"></div>
+
+                <aside class="drawer" id="crm-drawer" aria-hidden="true">
+                    <header class="drawer__head">
+                        <div class="drawer__who"><span class="drawer__avatar" id="d-avatar"></span><div><b id="d-name"></b><small id="d-interest"></small></div></div>
+                        <button class="drawer__close" id="d-close" aria-label="Cerrar">×</button>
+                    </header>
+                    <div class="drawer__meta">
+                        <span class="pill pill--ok" id="d-stage"></span><span class="drawer__val" id="d-value"></span>
+                    </div>
+                    <div class="drawer__body">
+                        <section class="drawer__chat">
+                            <div class="handoff" id="d-handoff"><span id="d-mode"></span><button class="mini mini--solid" id="d-take"></button></div>
+                            <div class="chatbox" id="d-chat"></div>
+                            <form class="chatin" id="d-form"><input id="d-input" autocomplete="off" aria-label="Mensaje de WhatsApp"><button class="mini mini--solid" type="submit">Enviar</button></form>
+                        </section>
+                        <section class="drawer__contact">
+                            <p class="drawer__label">Contacto</p>
+                            <dl id="d-contact"></dl>
+                        </section>
+                        <section class="drawer__notes">
+                            <p class="drawer__label">Notas internas</p>
+                            <ul id="d-notes"></ul>
+                            <form class="notein" id="d-note-form"><input id="d-note" placeholder="Agregar una nota…" autocomplete="off" aria-label="Nueva nota"><button class="mini" type="submit">Guardar</button></form>
+                        </section>
+                    </div>
+                </aside>
+                <div class="crm__toast" id="crm-toast" role="status"></div>
+            </div>
+        </div>
+
+        <h3 class="h3 reveal">Funcionalidades</h3>
+        <div class="crm-feats" id="crm-feats"></div>
+
+        <div class="crm-offer reveal">
+            <div>
+                <p class="kicker kicker--light">Oferta</p>
+                <h3>CRM de pacientes y ventas, instalado en los servidores de MedicalCenter</h3>
+                <ul class="crm-offer__list">
+                    <li>Sin costo por usuario ni licencias mensuales</li>
+                    <li>Integrado con WhatsApp, el bot de llamadas, el portal y Medicaltec</li>
+                    <li>Código fuente incluido, igual que el resto del proyecto</li>
+                </ul>
+            </div>
+            <div class="crm-offer__price">
+                <b id="crm-price"></b>
+                <small>pago único, impuestos incluidos</small>
+                <label class="voice__toggle"><input type="checkbox" id="crm-opt"><span class="switch" aria-hidden="true"></span><span>Incluir en la propuesta</span></label>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 07 INFRAESTRUCTURA -->
+<section class="sec sec--tint" id="infraestructura">
+    <div class="wrap">
+        <header class="sec__head reveal">
+            <span class="sec__num">07</span>
             <div><h2>Recursos de infraestructura</h2></div>
         </header>
         <div class="infra reveal">
@@ -349,11 +451,11 @@
     </div>
 </section>
 
-<!-- 07 CRONOGRAMA -->
+<!-- 08 CRONOGRAMA -->
 <section class="sec" id="cronograma">
     <div class="wrap">
         <header class="sec__head reveal">
-            <span class="sec__num">07</span>
+            <span class="sec__num">08</span>
             <div><h2>Cronograma</h2>
             <p class="sec__sub"><strong><span data-bind="meses"></span> meses</strong> desde la firma del contrato y la habilitación de accesos, con entregas parciales cada dos semanas para su validación.</p></div>
         </header>
@@ -361,11 +463,11 @@
     </div>
 </section>
 
-<!-- 08 DOCUMENTACIÓN -->
+<!-- 09 DOCUMENTACIÓN -->
 <section class="sec sec--tint" id="documentacion">
     <div class="wrap">
         <header class="sec__head reveal">
-            <span class="sec__num">08</span>
+            <span class="sec__num">09</span>
             <div><h2>Documentación y capacitación</h2></div>
         </header>
         <div class="two">
@@ -390,11 +492,11 @@
     </div>
 </section>
 
-<!-- 09 GARANTÍA -->
+<!-- 10 GARANTÍA -->
 <section class="sec" id="garantia">
     <div class="wrap">
         <header class="sec__head reveal">
-            <span class="sec__num">09</span>
+            <span class="sec__num">10</span>
             <div><h2>Garantía y soporte</h2>
             <p class="sec__sub"><strong><span data-bind="garantia"></span> meses de garantía</strong> desde el acta de aceptación, con corrección de errores y actualizaciones de seguridad sin costo adicional. Corregir un incumplimiento del alcance contratado nunca se considera desarrollo adicional.</p></div>
         </header>
@@ -403,11 +505,11 @@
     </div>
 </section>
 
-<!-- 10 CUMPLIMIENTO -->
+<!-- 11 CUMPLIMIENTO -->
 <section class="sec sec--tint" id="cumplimiento">
     <div class="wrap">
         <header class="sec__head reveal">
-            <span class="sec__num">10</span>
+            <span class="sec__num">11</span>
             <div><h2>Matriz de cumplimiento</h2>
             <p class="sec__sub">Declaración punto por punto frente a la especificación, indicando expresamente cada dependencia.</p></div>
         </header>
@@ -420,11 +522,11 @@
     </div>
 </section>
 
-<!-- 11 SUPUESTOS -->
+<!-- 12 SUPUESTOS -->
 <section class="sec" id="supuestos">
     <div class="wrap">
         <header class="sec__head reveal">
-            <span class="sec__num">11</span>
+            <span class="sec__num">12</span>
             <div><h2>Dependencias, supuestos y exclusiones</h2></div>
         </header>
         <div class="two">
@@ -434,11 +536,11 @@
     </div>
 </section>
 
-<!-- 12 ECONÓMICA -->
+<!-- 13 ECONÓMICA -->
 <section class="sec sec--tint" id="economica">
     <div class="wrap">
         <header class="sec__head reveal">
-            <span class="sec__num">12</span>
+            <span class="sec__num">13</span>
             <div><h2>Propuesta económica</h2>
             <p class="sec__sub">En bolivianos, llave en mano, con <strong>impuestos de ley incluidos</strong> y factura. Incluye código fuente, derechos de uso y modificación, documentación, capacitación y garantía. Elija los bots en la sección 05 y el total se actualiza al instante.</p></div>
         </header>
@@ -446,7 +548,7 @@
         <div class="price">
             <div class="price__list reveal">
                 <div class="lines" id="price-lines"></div>
-                <p class="price__hint">Los bots de WhatsApp y el bot de llamadas se eligen en la <a href="#bots">sección 05</a>.</p>
+                <p class="price__hint">Los bots de WhatsApp y el bot de llamadas se eligen en la <a href="#bots">sección 05</a>, y el CRM en la <a href="#crm">sección 06</a>.</p>
                 <p class="h4" id="opt-title">Componentes opcionales</p>
                 <div id="optionals"></div>
             </div>
@@ -505,6 +607,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="index.js"></script>
+<script src="crm.js"></script>
 <script src="pdf.js"></script>
 </body>
 </html>
