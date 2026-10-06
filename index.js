@@ -423,7 +423,7 @@ $('#bot-unit').textContent = bs0(P.bots.precio);
 html('#bot-grid', P.bots.tipos.map(([t, d, ico], i) =>
     `<article class="botc" id="bot-${i}">
      <span class="botc__top"><span class="botc__ico">${svg(ico)}</span></span>
-     <b>${esc(t)}</b><small>${esc(d)}</small><span class="botc__price">${bs0(P.bots.precio)}</span></article>`).join(''));
+     <b>${esc(t)}</b><small>${esc(d)}</small></article>`).join(''));
 $('#voice-desc').textContent = P.llamadas.descripcion;
 $('#voice-price').textContent = bs0(P.llamadas.precio);
 html('#voice-list', P.llamadas.funciones.map((f) => `<li>${esc(f)}</li>`).join(''));
