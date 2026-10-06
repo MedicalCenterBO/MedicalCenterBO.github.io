@@ -551,37 +551,69 @@ $('#extra-hour').textContent = `Hora de desarrollo adicional: ${bs0(P.horaExtra)
 html('#third', P.terceros.map(([a, b, c]) =>
     `<div class="third__item"><b>${esc(a)}</b><span class="tag">${esc(b)}</span><p>${esc(c)}</p></div>`).join(''));
 
-/* ---------- chat animado de WhatsApp ---------- */
+/* ---------- chat animado de WhatsApp: agendar una cita con el bot ---------- */
+// ['in'|'out', texto] · ['btns', opciones, índice elegido] · ['show', id de tarjeta flotante]
 const chat = [
-    ['in', 'Hola María 👋 Te recordamos tu cita de <b>Neurología</b> mañana a las <b>09:30</b>.'],
-    ['btns', '<span>✅ Confirmar</span><span>🔁 Reprogramar</span>'],
-    ['out', 'Confirmar'],
-    ['in', '¡Listo! Tu cita quedó <b>confirmada</b> en el sistema.'],
-    ['in', '🧪 Tu resultado de <b>Hemograma</b> ya está disponible.<br><u>Ver en el portal seguro</u>'],
-    ['out', 'Gracias 🙌'],
+    ['out', 'Hola, quiero agendar una cita con Neurología'],
+    ['in', '¡Hola! 👋 Soy el asistente de <b>MedicalCenter</b>. Para buscar su ficha, ¿me indica su número de CI?'],
+    ['out', '4589632'],
+    ['in', 'Gracias, <b>María Rojas</b> ✅<br>Estos son los horarios disponibles con el <b>Dr. R. Salvatierra</b>:'],
+    ['btns', ['Jue 8 · 09:00', 'Jue 8 · 11:00', 'Vie 9 · 15:00'], 0],
+    ['in', 'La consulta cuesta <b>Bs 350</b>. ¿Desea pagar ahora con QR para dejarla confirmada?'],
+    ['btns', ['Pagar con QR', 'Pagar en la clínica'], 0],
+    ['in', '<span class="wa-qr" aria-hidden="true"></span>Escanee el QR o ábralo en su app bancaria. Vence en 15 min.'],
+    ['show', 'fc-pago'],
+    ['in', '✅ <b>Pago recibido.</b> Su cita quedó confirmada:<br>🧠 Neurología · <b>jueves 8 de octubre, 09:00</b><br>📄 Le envié su factura y le recordaré un día antes.'],
+    ['show', 'fc-cita'],
+    ['out', '¡Gracias! 🙌'],
 ];
 async function playChat() {
     const box = $('#wa-chat'), status = $('#wa-status');
     const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-    if (reduced) { box.innerHTML = chat.map(([c, t]) => `<p class="${c}">${t}</p>`).join(''); return; }
+    const add = (cls, htmlTxt) => {
+        const p = document.createElement('p');
+        p.className = cls; p.innerHTML = htmlTxt;
+        box.appendChild(p);
+        box.scrollTo({ top: box.scrollHeight, behavior: reduced ? 'instant' : 'smooth' });
+        return p;
+    };
+    const fcs = $$('.float-card');
+    if (reduced) {
+        chat.forEach(([c, t, k]) => {
+            if (c === 'btns') { add('btns', t.map((o, i) => `<span class="${i === k ? 'tap' : ''}">${o}</span>`).join('')); add('out', t[k]); }
+            else if (c !== 'show') add(c, t);
+        });
+        fcs.forEach((f) => f.classList.add('is-on'));
+        return;
+    }
     for (;;) {
         box.innerHTML = '';
-        for (const [cls, txt] of chat) {
+        fcs.forEach((f) => f.classList.remove('is-on'));
+        await wait(600);
+        for (const [cls, txt, k] of chat) {
+            if (cls === 'show') { $('#' + txt).classList.add('is-on'); continue; }
             if (cls === 'in') {
                 status.textContent = 'escribiendo…';
-                const typing = document.createElement('p');
-                typing.className = 'in typing'; typing.innerHTML = '<i></i><i></i><i></i>';
-                box.appendChild(typing);
-                await wait(1100);
+                const typing = add('in typing', '<i></i><i></i><i></i>');
+                await wait(1200);
                 typing.remove();
                 status.textContent = 'en línea';
-            } else await wait(cls === 'out' ? 900 : 300);
-            const p = document.createElement('p');
-            p.className = cls; p.innerHTML = txt;
-            box.appendChild(p);
-            box.scrollTop = box.scrollHeight;
+                add('in', txt);
+                await wait(700);
+            } else if (cls === 'btns') {
+                const row = add('btns', txt.map((o) => `<span>${o}</span>`).join(''));
+                await wait(1100);
+                row.children[k].classList.add('tap');
+                await wait(450);
+                add('out', txt[k]);
+                await wait(500);
+            } else {
+                await wait(500);
+                add('out', txt);
+                await wait(400);
+            }
         }
-        await wait(4500);
+        await wait(5000);
     }
 }
 playChat();

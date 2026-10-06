@@ -105,19 +105,23 @@ code, .mono { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; 
 @keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.96); } }
 .wa-chat .in { background: #fff; align-self: flex-start; border-top-left-radius: 4px; }
 .wa-chat .out { background: #d9fdd3; align-self: flex-end; border-top-right-radius: 4px; }
-.wa-chat .btns { display: flex; gap: 6px; background: none; box-shadow: none; padding: 0; }
-.wa-chat .btns span { background: #fff; color: #027eb5; border-radius: 10px; padding: 7px 10px; font-weight: 600; font-size: .78rem; box-shadow: 0 1px 1px rgba(0,0,0,.08); }
+.wa-chat .btns { display: flex; flex-wrap: wrap; gap: 6px; background: none; box-shadow: none; padding: 0; max-width: 100%; }
+.wa-chat .btns span { background: #fff; color: #027eb5; border-radius: 10px; padding: 7px 10px; font-weight: 600; font-size: .78rem; box-shadow: 0 1px 1px rgba(0,0,0,.08); transition: background .25s, color .25s, transform .25s; }
+.wa-chat .btns span.tap { background: #027eb5; color: #fff; transform: scale(.95); }
+.wa-qr { display: block; width: 116px; height: 116px; margin: 2px auto 8px; border-radius: 8px; padding: 7px; border: 1px solid #e3e8e5; position: relative; background: conic-gradient(from 90deg at 30% 30%, #12263a 25%, transparent 0) 0 0 / 24px 24px, repeating-conic-gradient(#12263a 0 25%, #fff 0 50%) 0 0 / 10px 10px; background-clip: content-box; }
+.wa-qr::after { content: ''; position: absolute; inset: 44px; background: #fff url('https://medicalcenter.bo/wp-content/uploads/2021/05/cropped-logo-32x32.png') center/80% no-repeat; border-radius: 4px; }
 .wa-chat u { color: #027eb5; }
 .typing { display: flex; gap: 4px; padding: 12px 14px !important; }
 .typing i { width: 7px; height: 7px; border-radius: 50%; background: #9aa5a1; animation: blink 1s infinite; }
 .typing i:nth-child(2) { animation-delay: .15s; }
 .typing i:nth-child(3) { animation-delay: .3s; }
 @keyframes blink { 50% { opacity: .3; transform: translateY(-2px); } }
-.float-card { position: absolute; z-index: 3; display: flex; gap: 10px; align-items: center; background: rgba(255,255,255,.95); color: var(--ink); border-radius: 14px; padding: 10px 14px; box-shadow: var(--shadow-lg); font-size: .8rem; animation: bob 7s ease-in-out infinite; }
+.float-card { position: absolute; z-index: 3; display: flex; gap: 10px; align-items: center; background: rgba(255,255,255,.95); color: var(--ink); border-radius: 14px; padding: 10px 14px; box-shadow: var(--shadow-lg); font-size: .8rem; animation: bob 7s ease-in-out infinite; opacity: 0; scale: .85; transition: opacity .5s var(--ease), scale .5s var(--ease); }
+.float-card.is-on { opacity: 1; scale: 1; }
 .float-card b { display: block; color: var(--navy); font-size: .85rem; }
 .float-card small { color: var(--muted); }
-.float-card--a { top: 190px; left: 0; }
-.float-card--b { bottom: 70px; right: 0; animation-delay: -3s; }
+.float-card--a { top: 120px; left: -28px; }
+.float-card--b { bottom: 90px; right: -28px; animation-delay: -3s; }
 .fc-ico { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; background: var(--mint); color: var(--green); font-weight: 800; }
 .fc-ico--qr { background: var(--navy); color: #fff; font-size: .7rem; }
 
