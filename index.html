@@ -150,7 +150,7 @@
         <header class="sec__head reveal">
             <span class="sec__num">03</span>
             <div><h2>Así se verá el portal</h2>
-            <p class="sec__sub">El portal funciona en cualquier dispositivo (celular, tablet o computadora) y en tótems táctiles de gran formato instalados en la clínica. Para agendar no hace falta registrarse: el paciente elige la especialidad o el médico, escoge fecha y horario entre los cupos activos y recién entonces ingresa su número de teléfono. Si ya existe en la base de datos se lo reconoce; si no, completa su nombre y teléfono y queda registrado. Luego paga con QR y la cita queda agendada. En la misma plataforma, con usuario y contraseña, pacientes y médicos consultan su calendario de citas. Explore las vistas principales; el diseño final se valida con MedicalCenter en la fase de UX.</p></div>
+            <p class="sec__sub">El portal funciona en cualquier dispositivo (celular, tablet o computadora) y en tótems táctiles de gran formato instalados en la clínica. Para agendar no hace falta registrarse: el paciente elige la especialidad o el médico, escoge la fecha y la ficha entre los horarios activos y marca los servicios que necesita. Recién entonces ingresa su número de teléfono: si ya existe en la base de datos se lo reconoce; si no, completa su nombre y teléfono y queda registrado. Revisa la orden con sus datos de facturación, paga con QR y la cita queda agendada. En la misma plataforma, con usuario y contraseña, pacientes y médicos consultan su calendario de citas. Explore las vistas principales; el diseño final se valida con MedicalCenter en la fase de UX.</p></div>
         </header>
 
         <div class="demo reveal">
@@ -172,25 +172,9 @@
                         <div class="app__user"><i>MR</i><div><b id="demo-user">María Rojas</b><small id="demo-role">Paciente</small></div></div>
                     </aside>
 
-                    <!-- Agendar cita (sin registro) -->
+                    <!-- Agendar cita (sin registro): recorrido guiado, generado en index.js -->
                     <div class="app__main panel is-on" data-panel="paciente" role="tabpanel">
-                        <div class="app__top"><p class="app__hello">Agende su cita · <strong>sin registrarse</strong></p>
-                            <div class="seg"><span>1 Especialidad</span><span class="on">2 Horario</span><span>3 Teléfono</span><span>4 Pago</span></div></div>
-                        <div class="tiles">
-                            <div class="tile"><small>Especialidad</small><b>Neurología</b><span class="pill pill--ok">Elegida</span></div>
-                            <div class="tile"><small>Médico</small><b>Dr. R. Salvatierra</b><span class="pill pill--ok">Elegido</span></div>
-                            <div class="tile"><small>Sede</small><b>Cristo Redentor</b><span class="pill pill--mute">Cambiar</span></div>
-                        </div>
-                        <div class="list">
-                            <p class="list__title">Horarios disponibles</p>
-                            <div class="row"><span>Jue 08 oct</span><b>09:00</b><span class="pill pill--ok">Disponible</span><button class="mini">Elegir</button></div>
-                            <div class="row"><span>Jue 08 oct</span><b>09:30</b><span class="pill pill--ok">Disponible</span><button class="mini mini--solid" data-goto="pago">Elegir</button></div>
-                            <div class="row"><span>Vie 09 oct</span><b>15:00</b><span class="pill pill--ok">Disponible</span><button class="mini">Elegir</button></div>
-                        </div>
-                        <div class="next">
-                            <div><small>Paso 3 · Su número de teléfono</small><b>+591 7•• ••• 21</b><span>Si ya es paciente lo reconocemos; si no, solo pedimos su nombre y teléfono.</span></div>
-                            <div class="next__act"><button class="mini" data-goto="pago">Continuar al pago QR</button></div>
-                        </div>
+                        <div class="bk" id="bk" aria-live="polite"></div>
                     </div>
 
                     <!-- Mis citas (usuario y contraseña) -->
