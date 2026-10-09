@@ -314,7 +314,7 @@ html('#scope-grid', P.alcance.map(([t, d], i) =>
 
 /* ---------- demo del portal ---------- */
 const demo = {
-    paciente: { path: '/agendar', user: 'Tótem Recepción', role: 'Sin registro', nav: ['Agendar cita', 'Especialidades', 'Médicos', 'Ingresar'] },
+    paciente: { path: '/agendar', user: 'Tótem Recepción', role: 'Sin registro', nav: ['Inicio', 'Agendar cita', 'Mis citas', 'Ingresar'] },
     cuenta: { path: '/mis-citas', user: 'María Rojas', role: 'Paciente', nav: ['Mis citas', 'Resultados', 'Pagos y facturas', 'Mi perfil'] },
     medico: { path: '/agenda', user: 'Dr. R. Salvatierra', role: 'Neurología', nav: ['Agenda', 'Bloqueos', 'Pacientes del día', 'Mis facturas'] },
     admin: { path: '/admin/transacciones', user: 'Admin. Portal', role: 'Administrador', nav: ['Transacciones', 'Usuarios y roles', 'Parámetros', 'Conciliación', 'Auditoría'] },
@@ -345,6 +345,138 @@ $('.demo__tabs').addEventListener('keydown', (e) => {
 $$('[data-goto]').forEach((b) => b.addEventListener('click', () => showTab(b.dataset.goto)));
 addEventListener('resize', moveInk);
 showTab('paciente');
+
+/* ---------- agendar cita sin registro: recorrido guiado (datos de ejemplo) ---------- */
+const BK = {
+    especialidades: ['Medicina general', 'Pediatría', 'Ginecología', 'Neurología', 'Cardiología', 'Traumatología', 'Imagenología', 'Laboratorio'],
+    medicos: [
+        ['Dr. Ricardo Salvatierra', 'Neurología'],
+        ['Dra. Carla Méndez', 'Pediatría'],
+        ['Dr. Jorge Áñez', 'Medicina general'],
+        ['Dra. Lucía Arteaga', 'Ginecología'],
+        ['Dr. Marcelo Rivero', 'Cardiología'],
+        ['Dra. Paola Justiniano', 'Traumatología'],
+    ],
+    dias: [['Vie', '09', []], ['Sáb', '10', []], ['Lun', '12', [['6', '09:15'], ['7', '09:30'], ['8', '09:45'], ['9', '10:00']]], ['Mar', '13', [['3', '08:30'], ['4', '08:45']]]],
+    servicios: [['Consulta médica', 250], ['Electroencefalograma', 350], ['Electromiografía', 420], ['Doppler transcraneal', 380]],
+    pasos: ['Inicio', 'Cómo agendar', 'Especialidades', 'Médicos', 'Horarios', 'Servicios', 'Teléfono', 'Orden', 'Confirmar', 'Pago QR'],
+};
+const bk = { paso: 0, esp: null, fromEsp: false, med: 0, dia: 0, ficha: null, svc: new Set([0]), conocido: true, pagado: false };
+const ini = (n) => n.replace(/^Dr(a)?\.\s*/, '').split(' ').map((w) => w[0]).join('').slice(0, 2);
+const chev = '<i class="bk__chev" aria-hidden="true">›</i>';
+const bkTotal = () => [...bk.svc].reduce((a, i) => a + BK.servicios[i][1], 0);
+const bkMed = () => BK.medicos[bk.med];
+const bkFicha = () => BK.dias[bk.dia][2].find((f) => f[0] === bk.ficha);
+
+const BK_VISTAS = [
+    // 1 · inicio
+    () => `<div class="bk__user"><i>?</i><div><b>Sin usuario</b><a data-bk="ingresar">Iniciar sesión →</a></div></div>
+        <div class="bk__hero"><p>¿Necesita un médico?</p><button class="bk__btn" data-bk="go" data-to="1">Reservar ficha</button></div>
+        <p class="bk__h">Servicios</p>
+        <div class="bk__icons"><span><i>🧪</i>Laboratorio</span><span><i>🩻</i>Imagenología</span><span><i>📄</i>Resultados</span></div>
+        <p class="bk__h">Sedes</p>
+        <div class="bk__item bk__item--static"><b>Sede Cristo Redentor</b><small>Av. Cristo Redentor · Santa Cruz de la Sierra</small></div>`,
+    // 2 · cómo agendar
+    () => `<p class="bk__lead">Para reservar su ficha puede elegir el método que le sea más cómodo:</p>
+        <button class="bk__item" data-bk="go" data-to="2"><b>Especialidades</b>${chev}</button>
+        <button class="bk__item" data-bk="medicos"><b>Médicos</b>${chev}</button>`,
+    // 3 · especialidades
+    () => `<div class="bk__search">🔍 Buscar especialidad…</div>
+        ${BK.especialidades.map((e) => `<button class="bk__item" data-bk="esp" data-v="${esc(e)}"><b>${esc(e)}</b>${chev}</button>`).join('')}`,
+    // 4 · médicos
+    () => {
+        const l = BK.medicos.map((m, i) => [m, i]).filter(([m]) => !bk.esp || m[1] === bk.esp);
+        return `<div class="bk__search">🔍 Buscar médico…${bk.esp ? ` <span class="pill pill--ok">${esc(bk.esp)}</span>` : ''}</div>
+        ${l.map(([[n, e], i]) => `<button class="bk__item bk__doc" data-bk="med" data-v="${i}"><i>${ini(n)}</i><span><b>${esc(n)}</b><small>${esc(e)}</small></span>${chev}</button>`).join('')}`;
+    },
+    // 5 · horarios
+    () => {
+        const [n, e] = bkMed(), fichas = BK.dias[bk.dia][2];
+        return `<div class="bk__doc bk__doc--head"><i>${ini(n)}</i><span><b>${esc(n)}</b><small>${esc(e)}</small></span></div>
+        <p class="bk__h">Horario normal de atención</p>
+        <div class="bk__hours">${['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'].map((d) => `<span><b>${d}</b>08:00 a 12:00</span>`).join('')}</div>
+        <p class="bk__h">Fechas disponibles</p>
+        <div class="bk__days">${BK.dias.map(([d, n], i) => `<button class="${i === bk.dia ? 'on' : ''}" data-bk="dia" data-v="${i}"><small>${d}</small><b>${n}</b></button>`).join('')}</div>
+        <p class="bk__h">Seleccione su ficha</p>
+        ${fichas.length ? `<div class="bk__fichas">${fichas.map(([f, h]) => `<button class="${bk.ficha === f ? 'on' : ''}" data-bk="ficha" data-v="${f}"><small>Ficha</small><b>${f}</b><span>🕘 ${h}</span></button>`).join('')}</div>`
+        : '<div class="bk__empty">No hay fichas habilitadas para esta fecha. Elija otra fecha.</div>'}`;
+    },
+    // 6 · servicios
+    () => `<div class="bk__search">🔍 Buscar servicio…</div>
+        ${BK.servicios.map(([t, v], i) => `<label class="bk__svc"><input type="checkbox" data-bk="svc" data-v="${i}"${bk.svc.has(i) ? ' checked' : ''}><b>${esc(t)}</b><span>${bs0(v)}</span></label>`).join('')}
+        <div class="bk__foot"><div><small>${bk.svc.size} servicio(s)</small><b>${bs(bkTotal())}</b></div><button class="bk__btn" data-bk="go" data-to="6"${bk.svc.size ? '' : ' disabled'}>Solicitar</button></div>`,
+    // 7 · teléfono
+    () => `<div class="bk__notice">Para reservar ingrese su número de celular. No necesita crear una cuenta.</div>
+        <label class="bk__field"><span>Número de celular</span><input value="${bk.conocido ? '71234567' : '76543210'}" inputmode="tel"></label>
+        ${bk.conocido
+        ? '<div class="bk__found">✓ Encontramos su registro: <b>María Rojas</b></div>'
+        : '<label class="bk__field"><span>Nombre completo</span><input placeholder="Nombre y apellidos"></label><div class="bk__found bk__found--new">Número nuevo: lo registramos con su nombre y teléfono.</div>'}
+        <button class="bk__btn bk__btn--wide" data-bk="go" data-to="7">Continuar</button>
+        <p class="bk__alt"><a data-bk="nuevo">${bk.conocido ? 'Probar con un número nuevo' : 'Probar con un número registrado'}</a> · <a data-bk="ingresar">Ingresar con usuario y contraseña</a></p>`,
+    // 8 · orden
+    () => {
+        const [n, e] = bkMed(), [d, num] = BK.dias[bk.dia], f = bkFicha();
+        return `<p class="bk__h">Paciente</p>
+        <div class="bk__doc bk__doc--head"><i>${bk.conocido ? 'MR' : 'NP'}</i><span><b>${bk.conocido ? 'María Rojas' : 'Nuevo paciente'}</b><small>Cel. ${bk.conocido ? '71234567' : '76543210'}</small></span></div>
+        <p class="bk__h">Cita programada</p>
+        <div class="bk__doc bk__doc--head"><i>${ini(n)}</i><span><b>${esc(n)}</b><small>${esc(e)}</small></span><em>${d} ${num} oct<br>${f[1]}</em></div>
+        <p class="bk__h">Datos de facturación</p>
+        <div class="bk__grid2"><label class="bk__field"><span>NIT / CI</span><input value="1234567"></label><label class="bk__field"><span>Razón social</span><input value="${bk.conocido ? 'Rojas' : ''}"></label></div>
+        <label class="bk__field"><span>Correo para la factura</span><input value="${bk.conocido ? 'maria.rojas@correo.com' : ''}" placeholder="correo@ejemplo.com"></label>
+        <button class="bk__btn bk__btn--wide" data-bk="go" data-to="8">Continuar</button>`;
+    },
+    // 9 · confirmar
+    () => {
+        const [n, e] = bkMed(), [d, num] = BK.dias[bk.dia], f = bkFicha();
+        return `<div class="bk__ticket"><div class="bk__ticket-doc"><i>${ini(n)}</i><b>${esc(n)}</b><small>${esc(e)}</small></div>
+        <ul><li>👤 ${bk.conocido ? 'María Rojas' : 'Nuevo paciente'}</li><li>📅 ${d} ${num} de octubre</li><li>🕘 ${f[1]}</li><li>🏥 Sede Cristo Redentor</li></ul>
+        <div class="bk__ticket-tot"><b>Ficha ${f[0]}</b><small>Total</small><strong>${bs(bkTotal())}</strong></div></div>
+        <div class="bk__warn">Revise los datos del paciente y de la ficha antes de pagar.</div>
+        <div class="bk__tip">Preséntese 15 minutos antes de su cita.</div>
+        <button class="bk__btn bk__btn--wide" data-bk="go" data-to="9">Pagar con QR</button>`;
+    },
+    // 10 · pago QR
+    () => bk.pagado
+        ? `<div class="bk__done"><i>✓</i><b>Cita agendada</b><p>Ficha ${bkFicha()[0]} · ${BK.dias[bk.dia][0]} ${BK.dias[bk.dia][1]} oct · ${bkFicha()[1]}<br>La factura llega por correo y la confirmación por WhatsApp.</p>
+            <button class="bk__btn" data-bk="reset">Agendar otra cita</button></div>`
+        : `<p class="bk__lead bk__lead--c">Para completar la reserva de su ficha, pague ${bs(bkTotal())} escaneando el código QR.</p>
+        <div class="bk__qr"><div class="qr" aria-hidden="true"></div><small>Vence en 15 minutos · Ref. MC-2026-004812</small></div>
+        <div class="bk__qrbtns"><button class="mini">Descargar</button><button class="mini">Compartir</button></div>
+        <button class="bk__btn bk__btn--wide" data-bk="pagar">Ya realicé el pago</button>`,
+];
+
+function bkRender() {
+    const n = BK.pasos.length;
+    html('#bk', `<div class="bk__bar">${bk.paso ? '<button class="bk__back" data-bk="back" aria-label="Atrás">‹</button>' : ''}<b>${BK.pasos[bk.paso]}</b><small>Agendar sin registro</small></div>
+        <div class="bk__prog"><i style="width:${((bk.paso + 1) / n) * 100}%"></i></div>
+        <div class="bk__body">${BK_VISTAS[bk.paso]()}</div>`);
+}
+$('#bk').addEventListener('click', (e) => {
+    const t = e.target.closest('[data-bk]');
+    if (!t || t.dataset.bk === 'svc') return;
+    const v = t.dataset.v, go = (p) => { bk.paso = p; };
+    ({
+        go: () => go(+t.dataset.to),
+        back: () => go(bk.paso === 3 && !bk.fromEsp ? 1 : bk.paso - 1),
+        medicos: () => { bk.esp = null; bk.fromEsp = false; go(3); },
+        esp: () => { bk.esp = v; bk.fromEsp = true; go(3); },
+        med: () => { bk.med = +v; bk.dia = 0; bk.ficha = null; go(4); },
+        dia: () => { bk.dia = +v; bk.ficha = null; },
+        ficha: () => { bk.ficha = v; go(5); },
+        nuevo: () => { bk.conocido = !bk.conocido; },
+        ingresar: () => showTab('cuenta'),
+        pagar: () => { bk.pagado = true; },
+        reset: () => { Object.assign(bk, { paso: 0, esp: null, fromEsp: false, med: 0, dia: 0, ficha: null, svc: new Set([0]), conocido: true, pagado: false }); },
+    })[t.dataset.bk]?.();
+    if (t.dataset.bk !== 'ingresar') bkRender();
+});
+$('#bk').addEventListener('change', (e) => {
+    const t = e.target.closest('[data-bk=svc]');
+    if (!t) return;
+    t.checked ? bk.svc.add(+t.dataset.v) : bk.svc.delete(+t.dataset.v);
+    bkRender();
+});
+bkRender();
 
 // pago simulado
 let qrSecs = 899;

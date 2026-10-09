@@ -159,7 +159,7 @@ async function generarPDF() {
     h2('03', 'Experiencia del portal');
     para(textOf('#portal .sec__sub').replace('Explore las vistas principales; e', 'E'));
     table(['Vista', 'Funciones principales'], [
-        ['Agendar cita', 'Sin registro, desde cualquier dispositivo o tótem táctil: especialidad o médico, fecha y horario entre los cupos activos, número de teléfono (se reconoce al paciente o se registra con nombre y teléfono) y pago QR que confirma la cita.'],
+        ['Agendar cita', 'Sin registro, desde cualquier dispositivo o tótem táctil: por especialidad (médicos filtrados) o por médico (lista completa); fecha y ficha entre los horarios activos; servicios con total; número de teléfono (se reconoce al paciente o se registra con nombre y teléfono); orden con datos de facturación; confirmación y pago QR que agenda la cita.'],
         ['Mis citas', 'Con usuario y contraseña: calendario de citas con estado, reprogramación y cancelación; resultados de laboratorio e imagenología; pagos, facturas y perfil.'],
         ['Médico', 'Con usuario y contraseña: calendario de citas por día, semana y mes; cupos disponibles; estados de citas (confirmada, pendiente, pagada); bloqueos por ausencias, vacaciones y juntas.'],
         ['Administración', 'Transacciones confirmadas, pendientes y fallidas; reproceso autorizado; usuarios y roles; parámetros; conciliación de pagos y facturas; auditoría.'],
