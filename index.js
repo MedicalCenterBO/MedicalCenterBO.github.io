@@ -154,11 +154,7 @@ const PROPUESTA = {
     bots: {
         precio: 10000,
         tipos: [
-            ['Agendamiento de citas', 'Consulta disponibilidad y reserva, reprograma o cancela citas en Medicaltec.', 'cal', true],
-            ['Resultados', 'Consulta de resultados de laboratorio e imagenología con validación de identidad y enlace seguro.', 'lab', false],
-            ['Pagos y facturación', 'Envía el QR de pago, confirma el cobro y entrega la factura electrónica.', 'pay', false],
-            ['Atención e información', 'Especialidades, médicos, sedes, horarios y preparación de estudios, con derivación a un operador.', 'info', false],
-            ['Agenda para médicos', 'El médico consulta su agenda del día, bloquea horarios y recibe avisos de cambios.', 'doc', false],
+            ['Atención integral', 'Un solo bot con agendamiento de citas, resultados, pagos y facturación, atención e información y agenda para médicos.', 'cal', true],
             ['Encuestas de satisfacción', 'Encuesta breve después de la atención, con resultados en el módulo administrativo.', 'star', false],
         ],
     },
