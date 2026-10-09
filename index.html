@@ -114,7 +114,7 @@
         <div class="pillars">
             <article class="pillar reveal"><span class="pillar__ico">
                 <svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 100-8 4 4 0 000 8zm-7 9a7 7 0 0114 0" /></svg></span>
-                <h3>Pacientes</h3><p>Registro verificado, citas, pago QR, facturas y resultados de laboratorio e imagenología.</p></article>
+                <h3>Pacientes</h3><p>Agendan sin registrarse desde cualquier dispositivo o tótem, pagan con QR y consultan sus citas, facturas y resultados.</p></article>
             <article class="pillar reveal"><span class="pillar__ico">
                 <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>
                 <h3>Médicos</h3><p>Agenda diaria y semanal, bloqueos por ausencia o vacaciones, cupos y estados de citas.</p></article>
@@ -150,12 +150,13 @@
         <header class="sec__head reveal">
             <span class="sec__num">03</span>
             <div><h2>Así se verá el portal</h2>
-            <p class="sec__sub">Partimos de la identidad de MedicalCenter y la llevamos a un lenguaje más sobrio y clínico. Explore las vistas principales; el diseño final se valida con MedicalCenter en la fase de UX.</p></div>
+            <p class="sec__sub">El portal funciona en cualquier dispositivo (celular, tablet o computadora) y en tótems táctiles de gran formato instalados en la clínica. Para agendar no hace falta registrarse: el paciente elige la especialidad o el médico, escoge fecha y horario entre los cupos activos y recién entonces ingresa su número de teléfono. Si ya existe en la base de datos se lo reconoce; si no, completa su nombre y teléfono y queda registrado. Luego paga con QR y la cita queda agendada. En la misma plataforma, con usuario y contraseña, pacientes y médicos consultan su calendario de citas. Explore las vistas principales; el diseño final se valida con MedicalCenter en la fase de UX.</p></div>
         </header>
 
         <div class="demo reveal">
             <div class="demo__tabs" role="tablist" aria-label="Vistas del portal">
-                <button role="tab" aria-selected="true" data-tab="paciente">Paciente</button>
+                <button role="tab" aria-selected="true" data-tab="paciente">Agendar cita</button>
+                <button role="tab" aria-selected="false" data-tab="cuenta">Mis citas</button>
                 <button role="tab" aria-selected="false" data-tab="medico">Médico</button>
                 <button role="tab" aria-selected="false" data-tab="admin">Administración</button>
                 <button role="tab" aria-selected="false" data-tab="pago">Pago QR</button>
@@ -171,8 +172,29 @@
                         <div class="app__user"><i>MR</i><div><b id="demo-user">María Rojas</b><small id="demo-role">Paciente</small></div></div>
                     </aside>
 
-                    <!-- Paciente -->
+                    <!-- Agendar cita (sin registro) -->
                     <div class="app__main panel is-on" data-panel="paciente" role="tabpanel">
+                        <div class="app__top"><p class="app__hello">Agende su cita · <strong>sin registrarse</strong></p>
+                            <div class="seg"><span>1 Especialidad</span><span class="on">2 Horario</span><span>3 Teléfono</span><span>4 Pago</span></div></div>
+                        <div class="tiles">
+                            <div class="tile"><small>Especialidad</small><b>Neurología</b><span class="pill pill--ok">Elegida</span></div>
+                            <div class="tile"><small>Médico</small><b>Dr. R. Salvatierra</b><span class="pill pill--ok">Elegido</span></div>
+                            <div class="tile"><small>Sede</small><b>Cristo Redentor</b><span class="pill pill--mute">Cambiar</span></div>
+                        </div>
+                        <div class="list">
+                            <p class="list__title">Horarios disponibles</p>
+                            <div class="row"><span>Jue 08 oct</span><b>09:00</b><span class="pill pill--ok">Disponible</span><button class="mini">Elegir</button></div>
+                            <div class="row"><span>Jue 08 oct</span><b>09:30</b><span class="pill pill--ok">Disponible</span><button class="mini mini--solid" data-goto="pago">Elegir</button></div>
+                            <div class="row"><span>Vie 09 oct</span><b>15:00</b><span class="pill pill--ok">Disponible</span><button class="mini">Elegir</button></div>
+                        </div>
+                        <div class="next">
+                            <div><small>Paso 3 · Su número de teléfono</small><b>+591 7•• ••• 21</b><span>Si ya es paciente lo reconocemos; si no, solo pedimos su nombre y teléfono.</span></div>
+                            <div class="next__act"><button class="mini" data-goto="pago">Continuar al pago QR</button></div>
+                        </div>
+                    </div>
+
+                    <!-- Mis citas (usuario y contraseña) -->
+                    <div class="app__main panel" data-panel="cuenta" role="tabpanel">
                         <p class="app__hello">Buenos días, <strong>María</strong> 👋</p>
                         <div class="next">
                             <div><small>Próxima cita</small><b>Neurología · Dr. R. Salvatierra</b><span>Jueves 08 oct · 09:30 · Sede Cristo Redentor</span></div>
@@ -184,7 +206,7 @@
                             <div class="tile tile--pay"><small>Pago pendiente</small><b>Bs 350,00</b><button class="mini mini--solid" data-goto="pago">Pagar con QR</button></div>
                         </div>
                         <div class="list">
-                            <p class="list__title">Historial reciente</p>
+                            <p class="list__title">Calendario de citas</p>
                             <div class="row"><span>12 sep</span><b>Cardiología · control</b><span class="pill pill--ok">Atendida</span></div>
                             <div class="row"><span>28 ago</span><b>Ecografía abdominal</b><span class="pill pill--ok">Informe listo</span></div>
                             <div class="row"><span>15 ago</span><b>Consulta general</b><span class="pill pill--mute">Cancelada</span></div>
@@ -228,7 +250,7 @@
                             <div class="pay__info">
                                 <p class="app__hello">Pago de <strong>Consulta Neurología</strong></p>
                                 <dl class="pay__dl">
-                                    <div><dt>Servicio</dt><dd>Primera consulta</dd></div>
+                                    <div><dt>Cita</dt><dd>Jue 08 oct · 09:30 · Dr. R. Salvatierra</dd></div>
                                     <div><dt>Referencia</dt><dd class="mono">MC-2026-004812</dd></div>
                                     <div><dt>Moneda</dt><dd>Bolivianos</dd></div>
                                     <div><dt>Importe</dt><dd class="big">Bs 350,00</dd></div>
@@ -236,7 +258,7 @@
                                 <ol class="pay__steps" id="pay-steps">
                                     <li class="done">QR generado</li>
                                     <li class="now">Esperando confirmación del banco</li>
-                                    <li>Registro en Medicaltec</li>
+                                    <li>Cita agendada en Medicaltec</li>
                                     <li>Factura emitida por SBA</li>
                                 </ol>
                                 <button class="mini mini--solid" id="pay-sim">Simular pago</button>
@@ -261,6 +283,7 @@
             <ul class="ticks reveal">
                 <li><strong>100 % responsive</strong>, mobile-first, sin desplazamiento horizontal.</li>
                 <li>Accesibilidad <strong>WCAG 2.1 AA</strong>: contraste, foco visible, teclado y etiquetas.</li>
+                <li>Adaptado a <strong>tótems táctiles</strong> de gran formato: botones grandes y flujo guiado paso a paso.</li>
                 <li>Instalable como <strong>PWA</strong> en el celular, sin tienda de aplicaciones.</li>
                 <li>Estados siempre visibles: <em>confirmado · pendiente · fallido · vencido</em>.</li>
             </ul>
@@ -479,7 +502,7 @@
         <header class="sec__head reveal">
             <span class="sec__num">08</span>
             <div><h2>Cronograma</h2>
-            <p class="sec__sub"><strong><span data-bind="meses"></span> meses</strong> desde la firma del contrato y la habilitación de accesos, con entregas parciales cada dos semanas para su validación. El proyecto comienza con la plataforma de registro de pacientes y el tótem.</p></div>
+            <p class="sec__sub"><strong><span data-bind="meses"></span> meses</strong> desde la firma del contrato y la habilitación de accesos, con entregas parciales cada dos semanas para su validación. El proyecto comienza con el agendamiento sin registro y los tótems táctiles.</p></div>
         </header>
         <div class="gantt reveal" id="gantt"></div>
     </div>
