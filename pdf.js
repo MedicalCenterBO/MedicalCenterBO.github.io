@@ -123,7 +123,7 @@ async function generarPDF() {
     font('normal', 30, C.white, 'times'); doc.text(bs(total.total), M + 10, cy + 26);
     font('normal', 9, [169, 196, 184]);
     doc.text(`${total.bots.length} bot(s) de WhatsApp${total.llamadas ? ' · bot de llamadas IA' : ''}${total.crm ? ' · CRM' : ''}${total.opcionales.length ? ` · ${total.opcionales.length} opcional(es)` : ''} · Impuestos de ley incluidos (IVA 13 % e IT 3 %)`, M + 10, cy + 33);
-    [[`${P.meses} meses`, 'de implementación'], [`${P.cuotas.length} cuotas`, 'mensuales con avances'], [`${P.garantiaMeses} meses`, 'de garantía']].forEach(([a, b], i) => {
+    [[`${P.meses} meses`, 'de implementación'], [`${P.cuotas.length} cuotas`, 'mensuales iguales'], [`${P.garantiaMeses} meses`, 'de garantía']].forEach(([a, b], i) => {
         const x = M + 10 + i * 52;
         font('bold', 15, C.green200); doc.text(a, x, cy + 46);
         font('normal', 8, [184, 207, 197]); doc.text(b, x, cy + 51);
@@ -327,7 +327,7 @@ async function generarPDF() {
         didParseCell: (d) => { if (d.section === 'head' && d.column.index === 2) d.cell.styles.halign = 'right'; },
     });
 
-    h3(`Plan de pagos: ${P.cuotas.length} cuotas mensuales con avances`);
+    h3(`Plan de pagos: ${P.cuotas.length} cuotas mensuales`);
     para(textOf('.cuotas__intro'), { size: 9.5 });
     const montos = cuotas(total.total);
     table(['Cuota', 'Avance demostrado', 'Avance', 'Importe'], P.cuotas.map(([t, pct], i) => [`Mes ${i + 1}`, t, `${pct} %`, bs(montos[i])]), {

@@ -58,10 +58,12 @@ const PROPUESTA = {
 
     // [fase, quincena inicio, quincena fin] — 2 quincenas por mes
     gantt: [
-        ['Relevamiento y diseño funcional / UX', 1, 3],
-        ['Arquitectura e instalación base', 3, 4],
-        ['Integración Medicaltec', 4, 9],
-        ['Portal de pacientes', 5, 11],
+        ['Relevamiento y diseño UX de la plataforma de registro y el tótem', 1, 2],
+        ['Arquitectura e instalación base', 1, 2],
+        ['Plataforma de registro de pacientes y tótem', 2, 5],
+        ['Integración Medicaltec', 2, 9],
+        ['Relevamiento y diseño funcional / UX del resto del portal', 3, 5],
+        ['Portal de pacientes: citas, resultados, pagos e historial', 5, 11],
         ['Portal de médicos y administración', 7, 12],
         ['Radoffice e Interlab', 8, 10],
         ['Pagos QR y facturación SBA', 9, 12],
@@ -123,7 +125,7 @@ const PROPUESTA = {
 
     exclusiones: [
         'Costos, licencias o comisiones de terceros (Meta, OpenAI, banco), que se pagan directamente al proveedor del servicio.',
-        'Hardware, servidores y licencias de sistema operativo.',
+        'Hardware (incluido el equipo del tótem), servidores y licencias de sistema operativo.',
         'Monitoreo, observabilidad y respaldos, que se realizan con la infraestructura del datacenter de MedicalCenter.',
         'Capacitación a usuarios finales (médicos, recepción, caja); el personal de TI capacitado la replica.',
         'Adecuaciones o cambios internos en Medicaltec, Radoffice, Interlab o SBA, que se cotizan por separado si fueran necesarios.',
@@ -134,7 +136,7 @@ const PROPUESTA = {
 
     // [componente, importe, descripción, a dónde lleva "Ver", grupo de la lista de selección]
     precios: [
-        ['Portal de pacientes', 18000, 'Registro, identidad, citas, resultados, pagos, historial y perfil', { ir: '#portal', tab: 'paciente' }, 'Portal de autogestión'],
+        ['Portal de pacientes', 18000, 'Plataforma de registro y tótem en recepción, identidad, citas, resultados, pagos, historial y perfil', { ir: '#portal', tab: 'paciente' }, 'Portal de autogestión'],
         ['Portal de médicos', 15000, 'Agenda por día, semana y mes; bloqueos, cupos y estados', { ir: '#portal', tab: 'medico' }, 'Portal de autogestión'],
         ['Módulo administrativo', 18000, 'Usuarios y roles, parámetros, transacciones, reprocesos, auditoría y conciliación', { ir: '#portal', tab: 'admin' }, 'Portal de autogestión'],
         ['Integración Medicaltec', 17000, 'Conectores, reintentos, concurrencia y matriz de operaciones', { ir: '#arquitectura', sys: 'Medicaltec' }, 'Integraciones'],
@@ -218,17 +220,22 @@ const PROPUESTA = {
         },
     },
 
-    // Una cuota igual por mes, pagada contra la demostración del avance del mes.
+    // 12 cuotas mensuales iguales: las primeras se pagan contra la demostración del avance
+    // del mes durante la implementación (meses); las restantes, con el portal en producción.
     // [entregable demostrado, avance acumulado del proyecto en %]
     cuotas: [
-        ['Relevamiento concluido, prototipos navegables y matriz de operaciones de integración.', 12],
-        ['Diseño UX aprobado, arquitectura e instalación base en los servidores de MedicalCenter.', 25],
-        ['Conexión con Medicaltec: pacientes, agendas y registro de citas en ambiente de pruebas.', 38],
-        ['Portal de pacientes: registro, identidad y reserva de citas funcionando en pruebas.', 50],
+        ['Relevamiento y prototipos navegables de la plataforma de registro y el tótem; instalación base en los servidores de MedicalCenter.', 12],
+        ['Plataforma de registro y tótem en pruebas: validación con CI, código por WhatsApp/correo y vinculación con pacientes de Medicaltec.', 25],
+        ['Conexión con Medicaltec: agendas y registro de citas en ambiente de pruebas; diseño UX del resto del portal aprobado.', 38],
+        ['Portal de pacientes: reserva de citas, historial y perfil funcionando en pruebas.', 50],
         ['Portal de médicos y administración; resultados de Radoffice e Interlab visibles.', 63],
         ['Pagos QR, facturación SBA y primeros bots de WhatsApp operando en pruebas.', 75],
         ['Bots completos y bot de llamadas (si aplica), ajustes y validación con MedicalCenter.', 88],
         ['Puesta en producción, capacitación TI y entrega del código fuente y la documentación.', 100],
+        ['Portal en producción: operación estable y soporte de garantía.', 100],
+        ['Portal en producción: operación estable y soporte de garantía.', 100],
+        ['Portal en producción: operación estable y soporte de garantía.', 100],
+        ['Portal en producción: operación estable y soporte de garantía.', 100],
     ],
 
     planes: [
@@ -287,7 +294,7 @@ function seleccion() {
 }
 
 /* ---------- datos enlazados ---------- */
-const binds = { numero: P.numero, fecha: P.fecha, validez: P.validez, proveedor: P.proveedor, contacto: P.contacto, meses: P.meses, garantia: P.garantiaMeses };
+const binds = { numero: P.numero, fecha: P.fecha, validez: P.validez, proveedor: P.proveedor, contacto: P.contacto, meses: P.meses, cuotas: P.cuotas.length, garantia: P.garantiaMeses };
 $$('[data-bind]').forEach((el) => { el.textContent = binds[el.dataset.bind]; });
 
 /* ---------- contadores animados ---------- */
