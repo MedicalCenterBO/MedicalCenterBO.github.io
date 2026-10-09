@@ -18,7 +18,7 @@ const PROPUESTA = {
     alcance: [
         ['Relevamiento', 'Procesos, reglas de negocio y requisitos con cada área.'],
         ['Diseño funcional y UX', 'Flujos, prototipos navegables y sistema de diseño.'],
-        ['Frontend', 'Portales de pacientes, médicos y administración, 100 % responsive.'],
+        ['Frontend', 'Portales de pacientes, médicos y administración, 100 % responsive y adaptados a tótems táctiles.'],
         ['Backend', 'Autenticación, permisos, agendas, pagos, facturación, auditoría y errores.'],
         ['Integraciones', 'Medicaltec, Radoffice, Interlab, SBA, banco/pasarela y WhatsApp.'],
         ['Bots WhatsApp y de voz', 'Bots de WhatsApp con precio fijo por bot y bot de llamadas con IA opcional.'],
@@ -58,9 +58,9 @@ const PROPUESTA = {
 
     // [fase, quincena inicio, quincena fin] — 2 quincenas por mes
     gantt: [
-        ['Relevamiento y diseño UX de la plataforma de registro y el tótem', 1, 2],
+        ['Relevamiento y diseño UX del agendamiento y los tótems', 1, 2],
         ['Arquitectura e instalación base', 1, 2],
-        ['Plataforma de registro de pacientes y tótem', 2, 5],
+        ['Agendamiento sin registro y tótems táctiles', 2, 5],
         ['Integración Medicaltec', 2, 9],
         ['Relevamiento y diseño funcional / UX del resto del portal', 3, 5],
         ['Portal de pacientes: citas, resultados, pagos e historial', 5, 11],
@@ -93,7 +93,7 @@ const PROPUESTA = {
     cumplimiento: [
         ['1', 'Portal llave en mano, HTML5, responsive, sobre Ubuntu', 'ok', 'Cumple.'],
         ['2', 'Responsabilidad integral del proveedor', 'ok', 'TI de MedicalCenter solo aporta conocimiento y accesos.'],
-        ['3.1', 'Registro, identidad, roles y recuperación de acceso', 'ok', 'Validación con CI y código por WhatsApp/correo contra datos de Medicaltec.'],
+        ['3.1', 'Registro, identidad, roles y recuperación de acceso', 'ok', 'Agendamiento sin registro: identificación por número de teléfono contra la base de Medicaltec o registro rápido con nombre y teléfono. Usuario y contraseña para consultar el calendario de citas.'],
         ['3.2', 'Autogestión de citas', 'dep', 'Depende de que Medicaltec exponga servicios de reserva y cancelación; si no existen, se coordinan con su proveedor.'],
         ['3.3', 'Agendas médicas sin sobreasignación', 'ok', 'Reserva temporal del cupo y confirmación en Medicaltec.'],
         ['3.4', 'Módulo administrativo', 'ok', 'Cumple.'],
@@ -125,7 +125,7 @@ const PROPUESTA = {
 
     exclusiones: [
         'Costos, licencias o comisiones de terceros (Meta, OpenAI, banco), que se pagan directamente al proveedor del servicio.',
-        'Hardware (incluido el equipo del tótem), servidores y licencias de sistema operativo.',
+        'Hardware (incluidos los tótems táctiles), servidores y licencias de sistema operativo.',
         'Monitoreo, observabilidad y respaldos, que se realizan con la infraestructura del datacenter de MedicalCenter.',
         'Capacitación a usuarios finales (médicos, recepción, caja); el personal de TI capacitado la replica.',
         'Adecuaciones o cambios internos en Medicaltec, Radoffice, Interlab o SBA, que se cotizan por separado si fueran necesarios.',
@@ -136,8 +136,8 @@ const PROPUESTA = {
 
     // [componente, importe, descripción, a dónde lleva "Ver", grupo de la lista de selección]
     precios: [
-        ['Portal de pacientes', 18000, 'Plataforma de registro y tótem en recepción, identidad, citas, resultados, pagos, historial y perfil', { ir: '#portal', tab: 'paciente' }, 'Portal de autogestión'],
-        ['Portal de médicos', 15000, 'Agenda por día, semana y mes; bloqueos, cupos y estados', { ir: '#portal', tab: 'medico' }, 'Portal de autogestión'],
+        ['Portal de pacientes', 18000, 'Agendamiento sin registro desde cualquier dispositivo y tótems táctiles, identificación por teléfono, pago QR, calendario de citas con usuario y contraseña, resultados e historial', { ir: '#portal', tab: 'paciente' }, 'Portal de autogestión'],
+        ['Portal de médicos', 15000, 'Ingreso con usuario y contraseña; calendario de citas por día, semana y mes; bloqueos, cupos y estados', { ir: '#portal', tab: 'medico' }, 'Portal de autogestión'],
         ['Módulo administrativo', 18000, 'Usuarios y roles, parámetros, transacciones, reprocesos, auditoría y conciliación', { ir: '#portal', tab: 'admin' }, 'Portal de autogestión'],
         ['Integración Medicaltec', 17000, 'Conectores, reintentos, concurrencia y matriz de operaciones', { ir: '#arquitectura', sys: 'Medicaltec' }, 'Integraciones'],
         ['Integración Radoffice', 4000, 'Consulta HTTP que devuelve el enlace del estudio, mostrado en un visor embebido', { ir: '#arquitectura', sys: 'Radoffice' }, 'Integraciones'],
@@ -220,10 +220,10 @@ const PROPUESTA = {
     // del mes durante la implementación (meses); las restantes, con el portal en producción.
     // [entregable demostrado, avance acumulado del proyecto en %]
     cuotas: [
-        ['Relevamiento y prototipos navegables de la plataforma de registro y el tótem; instalación base en los servidores de MedicalCenter.', 12],
-        ['Plataforma de registro y tótem en pruebas: validación con CI, código por WhatsApp/correo y vinculación con pacientes de Medicaltec.', 25],
+        ['Relevamiento y prototipos navegables del agendamiento sin registro y los tótems táctiles; instalación base en los servidores de MedicalCenter.', 12],
+        ['Agendamiento sin registro en pruebas, también en el tótem: especialidad o médico, horarios activos, identificación por teléfono y registro rápido contra Medicaltec.', 25],
         ['Conexión con Medicaltec: agendas y registro de citas en ambiente de pruebas; diseño UX del resto del portal aprobado.', 38],
-        ['Portal de pacientes: reserva de citas, historial y perfil funcionando en pruebas.', 50],
+        ['Calendario de citas con usuario y contraseña para pacientes, historial y perfil funcionando en pruebas.', 50],
         ['Portal de médicos y administración; resultados de Radoffice e Interlab visibles.', 63],
         ['Pagos QR, facturación SBA y primeros bots de WhatsApp operando en pruebas.', 75],
         ['Bots completos y bot de llamadas (si aplica), ajustes y validación con MedicalCenter.', 88],
@@ -314,10 +314,11 @@ html('#scope-grid', P.alcance.map(([t, d], i) =>
 
 /* ---------- demo del portal ---------- */
 const demo = {
-    paciente: { path: '/inicio', user: 'María Rojas', role: 'Paciente', nav: ['Inicio', 'Mis citas', 'Resultados', 'Pagos y facturas', 'Mi perfil'] },
+    paciente: { path: '/agendar', user: 'Tótem Recepción', role: 'Sin registro', nav: ['Agendar cita', 'Especialidades', 'Médicos', 'Ingresar'] },
+    cuenta: { path: '/mis-citas', user: 'María Rojas', role: 'Paciente', nav: ['Mis citas', 'Resultados', 'Pagos y facturas', 'Mi perfil'] },
     medico: { path: '/agenda', user: 'Dr. R. Salvatierra', role: 'Neurología', nav: ['Agenda', 'Bloqueos', 'Pacientes del día', 'Mis facturas'] },
     admin: { path: '/admin/transacciones', user: 'Admin. Portal', role: 'Administrador', nav: ['Transacciones', 'Usuarios y roles', 'Parámetros', 'Conciliación', 'Auditoría'] },
-    pago: { path: '/pagos/MC-2026-004812', user: 'María Rojas', role: 'Paciente', nav: ['Inicio', 'Mis citas', 'Resultados', 'Pagos y facturas', 'Mi perfil'], active: 3 },
+    pago: { path: '/agendar/pago', user: 'María Rojas', role: 'Paciente', nav: ['Agendar cita', 'Especialidades', 'Médicos', 'Ingresar'] },
 };
 const tabs = $$('.demo__tabs [role=tab]');
 function showTab(key) {

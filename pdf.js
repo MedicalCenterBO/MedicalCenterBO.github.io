@@ -159,10 +159,11 @@ async function generarPDF() {
     h2('03', 'Experiencia del portal');
     para(textOf('#portal .sec__sub').replace('Explore las vistas principales; e', 'E'));
     table(['Vista', 'Funciones principales'], [
-        ['Paciente', 'Próxima cita con estado, reprogramación y cancelación; resultados de laboratorio e imagenología con descarga; pagos pendientes con QR; historial de citas, facturas y perfil.'],
-        ['Médico', 'Agenda por día, semana y mes; cupos disponibles; estados de citas (confirmada, pendiente, pagada); bloqueos por ausencias, vacaciones y juntas.'],
+        ['Agendar cita', 'Sin registro, desde cualquier dispositivo o tótem táctil: especialidad o médico, fecha y horario entre los cupos activos, número de teléfono (se reconoce al paciente o se registra con nombre y teléfono) y pago QR que confirma la cita.'],
+        ['Mis citas', 'Con usuario y contraseña: calendario de citas con estado, reprogramación y cancelación; resultados de laboratorio e imagenología; pagos, facturas y perfil.'],
+        ['Médico', 'Con usuario y contraseña: calendario de citas por día, semana y mes; cupos disponibles; estados de citas (confirmada, pendiente, pagada); bloqueos por ausencias, vacaciones y juntas.'],
         ['Administración', 'Transacciones confirmadas, pendientes y fallidas; reproceso autorizado; usuarios y roles; parámetros; conciliación de pagos y facturas; auditoría.'],
-        ['Pago QR', 'Servicio, importe, moneda y referencia antes de pagar; QR con vencimiento; estados en línea: QR generado, confirmación del banco, registro en Medicaltec y factura SBA.'],
+        ['Pago QR', 'Servicio, importe, moneda y referencia antes de pagar; QR con vencimiento; estados en línea: QR generado, confirmación del banco, cita agendada en Medicaltec y factura SBA.'],
         ['WhatsApp', 'Recordatorios con botones de confirmar o reprogramar, avisos de resultados y pagos, y enlaces seguros al portal.'],
     ], { columnStyles: { 0: { cellWidth: 32, fontStyle: 'bold', textColor: C.navy } } });
     h3('Principios de diseño');
