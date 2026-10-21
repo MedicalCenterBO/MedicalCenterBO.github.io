@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Tótem · Reserva de fichas · Clínica MedicalCenter</title>
-    <meta name="description" content="Demo del tótem táctil de Clínica MedicalCenter: reserve su ficha sin registrarse, elija médico y horario, y pague con QR.">
+    <title>Reserva de fichas · Clínica MedicalCenter</title>
+    <meta name="description" content="Demo de reserva de fichas de Clínica MedicalCenter: reserve su ficha sin registrarse, elija médico y horario, y pague con QR.">
     <link rel="icon" href="https://medicalcenter.bo/wp-content/uploads/2021/05/cropped-logo-32x32.png">
     <meta name="theme-color" content="#f6fbf9">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Demo · Tótem de reserva de fichas · Clínica MedicalCenter">
-    <meta property="og:description" content="Reserve su ficha sin registrarse desde el tótem táctil: especialidad, médico, horario y pago con QR. Demo de Servisofts S.R.L.">
+    <meta property="og:title" content="Demo · Reserva de fichas · Clínica MedicalCenter">
+    <meta property="og:description" content="Reserve su ficha sin registrarse desde cualquier dispositivo: especialidad, médico, horario y pago con QR. Demo de Servisofts S.R.L.">
     <meta property="og:image" content="https://medicalcenterbo.github.io/assets/og-image.jpg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,7 +22,7 @@
 <div class="bg" aria-hidden="true"><i></i><i></i><i></i></div>
 
 <!-- ============ PANTALLA DE ESPERA ============ -->
-<section class="idle" id="idle" aria-label="Pantalla de inicio del tótem">
+<section class="idle" id="idle" aria-label="Pantalla de inicio">
     <header class="idle__top">
         <img class="idle__logo" src="../assets/logo.png" alt="Clínica MedicalCenter">
         <div class="idle__status"><span class="live"></span>Sistema en línea<b id="idle-clock"></b></div>
@@ -76,7 +76,7 @@
     <div class="stage">
         <div class="screenwrap">
             <main class="screen" id="screen" aria-live="polite"></main>
-            <button class="kbtoggle" id="kbtoggle" type="button" aria-pressed="false" hidden aria-label="Usar el teclado en pantalla del tótem" title="Teclado del tótem">
+            <button class="kbtoggle" id="kbtoggle" type="button" aria-pressed="false" hidden aria-label="Usar el teclado en pantalla" title="Teclado en pantalla">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2.5"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 13.5h.01M18 13.5h.01M9 15.5h6"/></svg>
                 <i class="kbtoggle__sw" aria-hidden="true"></i>
             </button>
@@ -100,7 +100,7 @@
     <div class="modal__box" role="alertdialog" aria-labelledby="im-title">
         <div class="modal__count" id="im-count">15</div>
         <h2 id="im-title">¿Necesita más tiempo?</h2>
-        <p>Por seguridad, la reserva se cancelará y el tótem volverá al inicio.</p>
+        <p>Por seguridad, la reserva se cancelará y el sistema volverá al inicio.</p>
         <div class="modal__btns">
             <button class="btn btn--ghost" id="im-exit" type="button">Terminar</button>
             <button class="btn btn--primary" id="im-stay" type="button">Sí, continuar</button>

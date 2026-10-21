@@ -232,7 +232,7 @@ const VISTAS = [
             <h2>¡Ficha reservada!</h2>
             <p>${S.whatsapp ? `Le enviamos la confirmación y la factura por WhatsApp al ${S.tel}.` : 'Su factura fue emitida.'} Retire su comprobante impreso.</p>
             <p class="printing" id="printing">Imprimiendo su comprobante…</p>
-            <p class="restart">El tótem volverá al inicio en <b id="restart">25</b> segundos.</p></div>
+            <p class="restart">El sistema volverá al inicio en <b id="restart">25</b> segundos.</p></div>
             <div class="slip"><small>Clínica MedicalCenter</small><b>Ficha ${f.n}</b>
                 <p><strong>${esc(n)}</strong><br>${esc(e)}<br>${fechaLarga(fecha)} · ${f.hora}</p><hr>
                 <p>${esc(nombrePaciente())} · ${bs(total())} pagado</p><hr>
@@ -295,7 +295,7 @@ function principal() {
         case 6: return { txt: 'Continuar', ok: telValido() && (!!paciente() || S.nombre.trim().length > 2), info: telValido() ? '' : 'Ingrese los 8 dígitos de su celular' };
         case 7: return { txt: 'Continuar', ok: S.nit.length >= 5 && S.razon.trim().length > 1, info: 'NIT/CI y nombre son obligatorios' };
         case 8: return { txt: 'Pagar con QR', ok: true, info: `Total <b>${bs(total())}</b>` };
-        case 9: return { txt: S.pagando ? 'Verificando pago…' : 'Simular pago (demo)', ok: !S.pagando, info: 'En el tótem real, el pago se detecta solo' };
+        case 9: return { txt: S.pagando ? 'Verificando pago…' : 'Simular pago (demo)', ok: !S.pagando, info: 'En el sistema real, el pago se detecta solo' };
         case 10: return { txt: 'Finalizar', ok: true, info: '' };
     }
 }
@@ -433,7 +433,7 @@ $('#kbtoggle').addEventListener('click', (e) => {
     try { localStorage.setItem('totem.tecladoApp', TECLADO_APP ? '1' : '0'); } catch { /* sin almacenamiento */ }
     if (document.activeElement?.matches('input')) document.activeElement.blur();
     render();
-    toast(TECLADO_APP ? 'Teclado del tótem activado' : 'Usando el teclado del dispositivo');
+    toast(TECLADO_APP ? 'Teclado en pantalla activado' : 'Usando el teclado del dispositivo');
 });
 
 /* ---------- pago ---------- */
