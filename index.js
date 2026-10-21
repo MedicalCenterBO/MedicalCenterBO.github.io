@@ -134,20 +134,32 @@ const PROPUESTA = {
         'Funcionalidades fuera del alcance aprobado, que se cotizan por horas.',
     ],
 
-    // [componente, importe, descripción, a dónde lleva "Ver", grupo de la lista de selección]
-    precios: [
-        ['Portal de pacientes', 18000, 'Agendamiento sin registro desde cualquier dispositivo y tótems táctiles, identificación por teléfono, pago QR, calendario de citas con usuario y contraseña, resultados e historial', { ir: '#portal', tab: 'paciente' }, 'Portal de autogestión'],
-        ['Portal de médicos', 15000, 'Ingreso con usuario y contraseña; calendario de citas por día, semana y mes; bloqueos, cupos y estados', { ir: '#portal', tab: 'medico' }, 'Portal de autogestión'],
-        ['Módulo administrativo', 18000, 'Usuarios y roles, parámetros, transacciones, reprocesos, auditoría y conciliación', { ir: '#portal', tab: 'admin' }, 'Portal de autogestión'],
-        ['Integración Medicaltec', 17000, 'Conectores, reintentos, concurrencia y matriz de operaciones', { ir: '#arquitectura', sys: 'Medicaltec' }, 'Integraciones'],
-        ['Integración Radoffice', 4000, 'Consulta HTTP que devuelve el enlace del estudio, mostrado en un visor embebido', { ir: '#arquitectura', sys: 'Radoffice' }, 'Integraciones'],
-        ['Integración Interlab vía Medicaltec', 7000, 'Órdenes y resultados de laboratorio con descarga de informes', { ir: '#arquitectura', sys: 'Interlab', req: 'p3' }, 'Integraciones'],
-        ['Pagos QR', 10000, 'QR por transacción, confirmación del banco, estados y conciliación', { ir: '#portal', tab: 'pago' }, 'Integraciones'],
-        ['Facturación electrónica SBA', 10000, 'Emisión de la factura con el pago confirmado y regularización', { ir: '#arquitectura', sys: 'SBA' }, 'Integraciones'],
-        ['Plataforma de WhatsApp', 9000, 'Conexión Cloud API, IA conversacional (OpenAI), validación de identidad, notificaciones y enlaces seguros', { ir: '#bots' }, 'WhatsApp, voz e IA'],
-        ['Instalación y configuración en Ubuntu', 11000, 'Servidor, HTTPS, configuración de seguridad e inicio automático de servicios', { ir: '#infraestructura' }, 'Instalación y entrega'],
-        ['Puesta en producción y acompañamiento inicial', 9000, 'Salida a producción controlada y acompañamiento posterior', { ir: '#cronograma' }, 'Instalación y entrega'],
-        ['Documentación, capacitación TI y entrega del código fuente', 5000, 'Manuales en español, 26 horas de capacitación al personal de TI y repositorio completo', { ir: '#documentacion' }, 'Instalación y entrega'],
+    // Cotización modular: cinco componentes que se contratan por separado. Cada uno incluye su parte
+    // de integración con Medicaltec, instalación, puesta en producción, documentación y capacitación.
+    // Ítem: [nombre, importe, descripción, a dónde lleva "Ver" (req = ítem que necesita), marcado en "Recomendado"]
+    // Con todo marcado suma Bs 223.000 (la oferta completa); "Recomendado" suma Bs 143.000.
+    componentes: [
+        { key: 'r', nombre: 'Plataforma de reservas', demo: 'demo/?kiosk', resumen: 'Reserva de fichas por web, celular y tótems: especialidad o médico, calendario, código de paciente o registro, ficha con QR, pago y factura.', items: [
+            ['Reserva de fichas en línea y tótems', 46000, 'El recorrido de la demo: información de la clínica, especialidad o médico, calendario con horarios activos, código de paciente o registro rápido, ficha con QR y calendario de citas con usuario y contraseña. Incluye la integración de agendas con Medicaltec', { ir: '#portal', tab: 'paciente' }, true],
+            ['Pago con QR', 10000, 'QR por transacción, confirmación del banco, estados y conciliación', { ir: '#portal', tab: 'pago', req: 'r0' }, true],
+            ['Facturación electrónica SBA', 10000, 'Emisión de la factura con el pago confirmado y regularización', { ir: '#arquitectura', sys: 'SBA', req: 'r1' }, true],
+        ] },
+        { key: 'g', nombre: 'Software de gestión', demo: 'dashboard/', resumen: 'El sistema del personal: agenda por médico, sala de espera, reprogramaciones, usuarios y roles, transacciones, conciliación y auditoría.', items: [
+            ['Gestión de citas y módulo administrativo', 32000, 'Agenda por médico, lista de citas, sala de espera, reprogramación y cancelación; usuarios y roles, parámetros, transacciones, reprocesos, conciliación y auditoría', { ir: '#portal', tab: 'admin' }, true],
+            ['Portal de médicos', 15000, 'Ingreso con usuario y contraseña; calendario de citas por día, semana y mes; bloqueos, cupos y estados', { ir: '#portal', tab: 'medico', req: 'g0' }, true],
+            ['Resultados de imagenología (Radoffice)', 4000, 'Consulta HTTP que devuelve el enlace del estudio, mostrado en un visor embebido', { ir: '#arquitectura', sys: 'Radoffice', req: 'g0' }, true],
+            ['Resultados de laboratorio (Interlab vía Medicaltec)', 7000, 'Órdenes y resultados de laboratorio con descarga de informes', { ir: '#arquitectura', sys: 'Interlab', req: 'g0' }, true],
+        ] },
+        { key: 't', nombre: 'Agente de texto (WhatsApp)', resumen: 'Agente con IA que atiende por WhatsApp 24/7: agenda, resultados, pagos, información y avisos.', items: [
+            ['Agente de atención integral', 19000, 'Plataforma de WhatsApp (Cloud API, IA conversacional, validación de identidad, notificaciones y enlaces seguros) y el agente de agendamiento, resultados, pagos, información y agenda médica', { ir: '#bots', bot: 0 }, true],
+            ['Encuestas de satisfacción', 10000, 'Encuesta breve después de la atención, con resultados en el módulo administrativo', { ir: '#bots', bot: 1, req: 't0' }, false],
+        ] },
+        { key: 'v', nombre: 'Agente de voz', resumen: 'Agente con IA que llama y atiende llamadas en español natural, conectado a las mismas agendas.', items: [
+            ['Agente de llamadas con IA', 25000, 'Confirmaciones y recordatorios salientes, atención de llamadas 24/7, reserva y reprogramación, derivación a un operador y transcripción', { ir: '.voice' }, false],
+        ] },
+        { key: 'c', nombre: 'CRM de pacientes y ventas', resumen: 'Embudos de consultas, cirugías y convenios con chat de WhatsApp en tiempo real, IA y derivación a un asesor.', items: [
+            ['CRM de pacientes y ventas', 45000, 'Pipelines, arrastrar y soltar, chat de WhatsApp en tiempo real, calendario de citas consultable por la IA y derivación humana', { ir: '#crm' }, false],
+        ] },
     ],
 
     // Precio fijo por cada bot de WhatsApp. [nombre, descripción, icono, incluido por defecto]
@@ -266,13 +278,8 @@ function cuotas(total) {
     return P.cuotas.map((_, i) => (i < n - 1 ? c : Math.round((total - c * (n - 1)) * 100) / 100));
 }
 
-// lista de selección: cada ítem con su clave, importe, destino de "Ver", grupo y si viene marcado
-const ITEMS = [
-    ...P.precios.map(([t, v, d, ver, g], i) => ({ key: 'p' + i, tipo: 'base', t, v, d, ver, g, on: true })),
-    ...P.bots.tipos.map(([t, d, , on], i) => ({ key: 'b' + i, tipo: 'bot', t: 'Bot de WhatsApp: ' + t, nombre: t, v: P.bots.precio, d, ver: { ir: '#bots', bot: i, req: 'p8' }, g: 'WhatsApp, voz e IA', on })),
-    { key: 'voz', tipo: 'voz', t: 'Bot de llamadas con IA', v: P.llamadas.precio, d: 'Agente de voz para confirmaciones, recordatorios y atención 24/7', ver: { ir: '.voice' }, g: 'WhatsApp, voz e IA', on: false },
-    { key: 'crm', tipo: 'crm', t: 'CRM de pacientes y ventas', v: P.crm.precio, d: 'Pipelines, arrastrar y soltar, chat de WhatsApp en tiempo real, calendario de citas consultable por la IA y derivación humana', ver: { ir: '#crm', req: 'p8' }, g: 'CRM', on: false },
-];
+// lista de selección: cada ítem con su clave (letra del componente + posición), importe, destino de "Ver", componente y si viene marcado
+const ITEMS = P.componentes.flatMap((c) => c.items.map(([t, v, d, ver, on], i) => ({ key: c.key + i, comp: c.key, t, v, d, ver, g: c.nombre, on })));
 const totalInicial = ITEMS.filter((i) => i.on).reduce((a, i) => a + i.v, 0);
 
 // selección vigente (la usan la lista, el total y el PDF)
@@ -281,9 +288,10 @@ function seleccion() {
     const items = ITEMS.filter((i) => on.has(i.key));
     return {
         items,
-        bots: items.filter((i) => i.tipo === 'bot').map((i) => P.bots.tipos[+i.key.slice(1)]),
-        llamadas: on.has('voz'),
-        crm: on.has('crm'),
+        componentes: P.componentes.filter((c) => items.some((i) => i.comp === c.key)),
+        bots: items.filter((i) => i.ver.bot !== undefined).map((i) => P.bots.tipos[i.ver.bot]),
+        llamadas: items.some((i) => i.comp === 'v'),
+        crm: items.some((i) => i.comp === 'c'),
         opcionales: [],
         total: items.reduce((a, i) => a + i.v, 0),
     };
@@ -566,32 +574,40 @@ html('#voice-list', P.llamadas.funciones.map((f) => `<li>${esc(f)}</li>`).join('
 html('.wave', Array.from({ length: 32 }, (_, i) => `<i style="--i:${i}"></i>`).join(''));
 
 /* ---------- lista de selección y total ---------- */
-const GRUPOS = [...new Set(ITEMS.map((i) => i.g))];
-html('#checklist', GRUPOS.map((g) => {
-    const list = ITEMS.filter((i) => i.g === g);
-    return `<fieldset class="ckgroup"><legend><span>${esc(g)}</span><small data-sub="${esc(g)}"></small></legend>
-        ${list.map((i) => `<div class="ck" data-row="${i.key}">
+// un grupo por componente: la casilla del encabezado marca o desmarca el componente completo
+const arrow = '<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+html('#checklist', P.componentes.map((c) => {
+    const list = ITEMS.filter((i) => i.comp === c.key), full = list.reduce((a, i) => a + i.v, 0);
+    return `<fieldset class="ckgroup" data-comp="${c.key}"><legend class="ckgroup__head">
+            <label class="ck__main"><input type="checkbox" data-group="${c.key}"><span class="ck__box" aria-hidden="true"></span>
+                <span class="ck__txt"><b>${esc(c.nombre)}</b><small>${esc(c.resumen)}</small>
+                ${c.demo ? `<a class="ckgroup__demo" href="${c.demo}" target="_blank" rel="noopener">Probar la demo ${arrow}</a>` : ''}</span></label>
+            <span class="ckgroup__v"><b>${bs0(full)}</b><small data-sub="${c.key}"></small></span></legend>
+        ${list.length > 1 ? list.map((i) => `<div class="ck" data-row="${i.key}">
             <label class="ck__main"><input type="checkbox" data-item="${i.key}"${i.on ? ' checked' : ''}><span class="ck__box" aria-hidden="true"></span>
                 <span class="ck__txt"><b>${esc(i.t)}</b><small>${esc(i.d)}</small><em class="ck__req" hidden></em></span></label>
-            <button class="ck__ver" type="button" data-ver="${i.key}" aria-label="Ver la explicación de ${esc(i.t)}">Ver
-                <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="ck__ver" type="button" data-ver="${i.key}" aria-label="Ver la explicación de ${esc(i.t)}">Ver ${arrow}</button>
             <span class="ck__v">${bs0(i.v)}</span>
-        </div>`).join('')}
+        </div>`).join('') : `<input type="checkbox" data-item="${list[0].key}"${list[0].on ? ' checked' : ''} hidden>
+        <div class="ck ck--solo" data-row="${list[0].key}"><span class="ck__txt"><small>${esc(list[0].d)}</small></span>
+            <button class="ck__ver" type="button" data-ver="${list[0].key}" aria-label="Ver la explicación de ${esc(list[0].t)}">Ver ${arrow}</button></div>`}
     </fieldset>`;
 }).join(''));
 
-// dependencias: un bot o el CRM necesitan la plataforma de WhatsApp; Interlab necesita Medicaltec
+// dependencias dentro de cada componente: los ítems adicionales necesitan el ítem principal
 const box = (k) => $(`[data-item="${k}"]`);
 function dependencias(changed) {
-    ITEMS.forEach((i) => {
-        const req = i.ver.req; if (!req) return;
-        const need = box(req), me = box(i.key);
-        if (changed === me && me.checked && !need.checked) need.checked = true;
-        if (changed === need && !need.checked && me.checked) me.checked = false;
-    });
+    // al marcar un ítem se marcan los que necesita, en cadena (factura → pago QR → reservas)
+    let it = changed && changed.checked && ITEMS.find((i) => i.key === changed.dataset.item);
+    while (it && it.ver.req) { box(it.ver.req).checked = true; it = ITEMS.find((i) => i.key === it.ver.req); }
+    // un ítem cuyo requisito quedó sin marcar se desmarca, también en cadena
+    for (let again = true; again;) {
+        again = false;
+        ITEMS.forEach((i) => { if (i.ver.req && box(i.key).checked && !box(i.ver.req).checked) { box(i.key).checked = false; again = true; } });
+    }
     ITEMS.forEach((i) => {
         const req = i.ver.req, note = $(`[data-row="${i.key}"] .ck__req`);
-        if (!req) return;
+        if (!req || !note) return;
         note.hidden = false;
         note.textContent = 'Requiere: ' + ITEMS.find((x) => x.key === req).t;
     });
@@ -612,17 +628,17 @@ function animateTo(el, from, to) {
 function recalc() {
     const sel = seleccion(), total = sel.total;
     $$('.ck').forEach((r) => r.classList.toggle('is-on', box(r.dataset.row).checked));
-    GRUPOS.forEach((g) => {
-        const sub = ITEMS.filter((i) => i.g === g && box(i.key).checked).reduce((a, i) => a + i.v, 0);
-        $(`[data-sub="${g}"]`).textContent = sub ? bs0(sub) : 'Nada marcado';
+    P.componentes.forEach((c) => {
+        const list = ITEMS.filter((i) => i.comp === c.key), on = list.filter((i) => box(i.key).checked);
+        const sub = on.reduce((a, i) => a + i.v, 0), g = $(`[data-group="${c.key}"]`);
+        g.checked = on.length > 0; g.indeterminate = on.length > 0 && on.length < list.length;
+        $(`[data-comp="${c.key}"]`).classList.toggle('is-on', on.length > 0);
+        $(`[data-sub="${c.key}"]`).textContent = !on.length ? 'No incluido' : on.length === list.length ? 'Incluido completo' : `Incluido: ${bs0(sub)}`;
     });
 
     animateTo($('#sum-total'), shown, total); shown = total;
-    const parts = [`${sel.bots.length} bot${sel.bots.length === 1 ? '' : 's'} de WhatsApp`];
-    if (sel.llamadas) parts.push('bot de llamadas IA');
-    if (sel.crm) parts.push('CRM');
-    $('#sum-note').textContent = 'Incluye ' + parts.join(' · ');
-    $('#sum-count').textContent = `${sel.items.length} de ${ITEMS.length} componentes marcados`;
+    $('#sum-note').textContent = sel.componentes.length ? 'Incluye ' + sel.componentes.map((c) => c.nombre).join(' · ') : 'Marque al menos un componente';
+    $('#sum-count').textContent = `${sel.componentes.length} de ${P.componentes.length} componentes · ${sel.items.length} de ${ITEMS.length} ítems marcados`;
     const iva = total * P.iva, it = total * P.it;
     $('#t-net').textContent = bs(total - iva - it);
     $('#t-iva').textContent = bs(iva);
@@ -637,8 +653,15 @@ function recalc() {
          <p>${esc(t)}</p><div class="cuota__bar"><i></i></div><small>Avance del proyecto: <strong>${pct} %</strong></small></article>`).join(''));
 }
 $$('[data-item]').forEach((c) => c.addEventListener('change', () => { dependencias(c); recalc(); }));
+// el componente completo: si estaba parcial o vacío se marca todo; si estaba completo se desmarca
+$$('[data-group]').forEach((g) => g.addEventListener('change', () => {
+    const list = ITEMS.filter((i) => i.comp === g.dataset.group), all = list.every((i) => box(i.key).checked);
+    list.forEach((i) => { box(i.key).checked = !all; });
+    recalc();
+}));
 $('#ck-rec').addEventListener('click', () => { ITEMS.forEach((i) => { box(i.key).checked = i.on; }); recalc(); });
 $('#ck-all').addEventListener('click', () => { ITEMS.forEach((i) => { box(i.key).checked = true; }); recalc(); });
+$('#ck-none').addEventListener('click', () => { ITEMS.forEach((i) => { box(i.key).checked = false; }); recalc(); });
 dependencias();
 $('#sum-total').textContent = bs(totalInicial);
 recalc();

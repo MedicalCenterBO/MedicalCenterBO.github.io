@@ -122,7 +122,7 @@ async function generarPDF() {
     font('bold', 7.5, [143, 179, 163]); doc.text('INVERSIÓN TOTAL LLAVE EN MANO', M + 10, cy + 12);
     font('normal', 30, C.white, 'times'); doc.text(bs(total.total), M + 10, cy + 26);
     font('normal', 9, [169, 196, 184]);
-    doc.text(`${total.bots.length} bot(s) de WhatsApp${total.llamadas ? ' · bot de llamadas IA' : ''}${total.crm ? ' · CRM' : ''}${total.opcionales.length ? ` · ${total.opcionales.length} opcional(es)` : ''} · Impuestos de ley incluidos (IVA 13 % e IT 3 %)`, M + 10, cy + 33);
+    doc.text(doc.splitTextToSize(`${total.componentes.map((c) => c.nombre).join(' · ')} · Impuestos de ley incluidos (IVA 13 % e IT 3 %)`, CW - 20), M + 10, cy + 33);
     [[`${P.meses} meses`, 'de implementación'], [`${P.cuotas.length} cuotas`, 'mensuales iguales'], [`${P.garantiaMeses} meses`, 'de garantía']].forEach(([a, b], i) => {
         const x = M + 10 + i * 52;
         font('bold', 15, C.green200); doc.text(a, x, cy + 46);
@@ -298,7 +298,7 @@ async function generarPDF() {
         ['', 'TOTAL LLAVE EN MANO (impuestos incluidos)', bs(total.total)],
     ];
     // solo los componentes marcados en la lista de selección
-    const rows = total.items.map((it, i) => [String(i + 1).padStart(2, '0'), it.d ? `${it.t}\n${it.d}` : it.t, bs(it.v)]);
+    const rows = total.items.map((it, i) => [String(i + 1).padStart(2, '0'), `${it.g}: ${it.t}\n${it.d}`, bs(it.v)]);
     table(['#', 'Componente', 'Importe'], rows, {
         columnStyles: { 0: { cellWidth: 11, textColor: C.muted }, 2: { cellWidth: 34, halign: 'right', fontStyle: 'bold', textColor: C.navy } },
         foot,
