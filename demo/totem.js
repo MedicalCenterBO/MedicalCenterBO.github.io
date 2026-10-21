@@ -189,7 +189,8 @@ const VISTAS = [
 
     // 7 · facturación
     () => `<p class="lead">¿A nombre de quién emitimos la factura?</p>
-        <div class="grid2">${campo('nit', 'NIT o CI', 'num', 'Toque para escribir')}${campo('razon', 'Nombre o razón social', 'alpha', 'Toque para escribir')}</div>
+        <div class="note">Estos datos son opcionales. Si los deja vacíos, la factura se emite a nombre de ${esc(nombrePaciente())} sin NIT.</div>
+        <div class="grid2">${campo('nit', 'NIT o CI (opcional)', 'num', 'Toque para escribir')}${campo('razon', 'Nombre o razón social (opcional)', 'alpha', 'Toque para escribir')}</div>
         <button class="toggle${S.whatsapp ? ' is-on' : ''}" data-a="whatsapp"><span class="sw"></span><span><b>Enviarme la factura y la confirmación por WhatsApp</b><small>Al +591 ${S.tel}</small></span></button>
         ${campo('correo', 'Correo electrónico (opcional)', 'email', 'Toque para escribir su correo')}`,
 
@@ -202,7 +203,7 @@ const VISTAS = [
                 <li><i>${ico('user')}</i><span><b>${esc(nombrePaciente())}</b><small>Cel. ${S.tel}</small></span></li>
                 <li><i>${ico('steth')}</i><span><b>${esc(n)}</b><small>${esc(e)}</small></span></li>
                 <li><i>${ico('cal')}</i><span><b>${fechaLarga(fecha)}</b><small>${f.hora} · Sede Cristo Redentor</small></span></li>
-                <li><i>${ico('recibo')}</i><span><b>${[...S.svc].map((i) => servicios()[i][0]).join(', ')}</b><small>Factura a ${esc(S.razon)} · NIT/CI ${S.nit}</small></span></li>
+                <li><i>${ico('recibo')}</i><span><b>${[...S.svc].map((i) => servicios()[i][0]).join(', ')}</b><small>Factura a ${esc(S.razon.trim() || nombrePaciente())} · ${S.nit ? `NIT/CI ${S.nit}` : 'sin NIT'}</small></span></li>
             </ul><div class="ticket__tot"><small>Total a pagar</small><b>${bs(total())}</b></div></div>
         </div>
         <div class="note note--warn">Revise que los datos sean correctos antes de pagar. Preséntese 15 minutos antes de su cita.</div>`;
@@ -293,7 +294,7 @@ function principal() {
         case 4: return { txt: 'Continuar', ok: !!fichaSel(), info: fichaSel() ? `Ficha <b>${S.ficha}</b> · ${fichaSel().hora}` : 'Toque una ficha libre' };
         case 5: return { txt: 'Continuar', ok: S.svc.size > 0, info: `${S.svc.size} servicio(s) · <b>${bs(total())}</b>` };
         case 6: return { txt: 'Continuar', ok: telValido() && (!!paciente() || S.nombre.trim().length > 2), info: telValido() ? '' : 'Ingrese los 8 dígitos de su celular' };
-        case 7: return { txt: 'Continuar', ok: S.nit.length >= 5 && S.razon.trim().length > 1, info: 'NIT/CI y nombre son obligatorios' };
+        case 7: return { txt: S.nit || S.razon.trim() ? 'Continuar' : 'Continuar sin datos', ok: true, info: '' };
         case 8: return { txt: 'Pagar con QR', ok: true, info: `Total <b>${bs(total())}</b>` };
         case 9: return { txt: S.pagando ? 'Verificando pago…' : 'Simular pago (demo)', ok: !S.pagando, info: 'En el sistema real, el pago se detecta solo' };
         case 10: return { txt: 'Finalizar', ok: true, info: '' };
