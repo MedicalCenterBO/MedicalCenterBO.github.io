@@ -101,6 +101,13 @@ const ICONOS = {
 };
 const ico = (k) => `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">${ICONOS[k] || ''}</svg>`;
 
+/* ---------- modo de teclado ----------
+   Por defecto se usa el teclado del dispositivo (campos de texto normales).
+   El botón flotante activa los teclados en pantalla del tótem. */
+let TECLADO_APP = false;
+try { TECLADO_APP = localStorage.getItem('totem.tecladoApp') === '1' || /teclado=app/.test(location.search); } catch { /* sin almacenamiento */ }
+const PASOS_CON_TEXTO = [2, 3, 6, 7];
+
 /* ---------- estado de la reserva ---------- */
 const NUEVA = () => ({ paso: 0, esp: null, viaEsp: false, med: null, dia: 0, ficha: null, svc: new Set(), tel: '', nombre: '', nit: '', razon: '', correo: '', whatsapp: true, pagando: false, pagado: false, buscar: '' });
 let S = NUEVA();
@@ -139,21 +146,10 @@ const VISTAS = [
         </div>`,
 
     // 2 · especialidades
-    () => {
-        const q = sinTildes(S.buscar.trim());
-        const l = ESPECIALIDADES.filter(([n]) => sinTildes(n).includes(q));
-        return `${buscador('Buscar especialidad')}
-        <div class="tiles">${l.map(([n, i, d]) => `<button class="tile" data-a="esp" data-v="${esc(n)}"><i>${ico(i)}</i><b>${esc(n)}</b><small>${esc(d)}</small></button>`).join('') || '<div class="empty">No encontramos esa especialidad.</div>'}</div>`;
-    },
+    () => `${buscador('Buscar especialidad')}<div id="lista">${listaEsp()}</div>`,
 
     // 3 · médicos
-    () => {
-        const q = sinTildes(S.buscar.trim());
-        const l = MEDICOS.map((m, i) => [m, i]).filter(([m]) => (!S.esp || m[1] === S.esp) && (sinTildes(m[0]).includes(q) || sinTildes(m[1]).includes(q)));
-        return `${buscador('Buscar médico', S.esp)}
-        <div class="docs">${l.map(([[n, e, dias, ini, fin], i]) => `<button class="doc" data-a="med" data-v="${i}"><span class="av">${iniciales(n)}</span>
-            <span><b>${esc(n)}</b><small>${esc(e)}</small><em>${rangoDias(dias)} · ${hhmm(ini * 60)} a ${hhmm(fin * 60)}</em></span><span class="go">›</span></button>`).join('') || '<div class="empty">No encontramos ese médico.</div>'}</div>`;
-    },
+    () => `${buscador('Buscar médico', S.esp)}<div id="lista">${listaMed()}</div>`,
 
     // 4 · fecha y ficha
     () => {
@@ -177,25 +173,19 @@ const VISTAS = [
             <span class="box">${S.svc.has(i) ? '✓' : ''}</span><span><b>${esc(t)}</b>${d ? `<small>${esc(d)}</small>` : ''}</span><span class="pr">${bs0(v)}</span></button>`).join('')}</div>`,
 
     // 6 · celular
-    () => {
-        const p = paciente();
-        const disp = S.tel ? `<b>${S.tel.replace(/(\d{4})(?=\d)/, '$1 ')}</b><i class="caret"></i>` : '<b class="ph">7000 0000</b>';
-        return `<div class="phone">
+    () => `<div class="phone${TECLADO_APP ? '' : ' phone--nativo'}">
             <div class="phone__left">
                 <p class="lead">Ingrese su número de celular</p>
                 <div class="note">No necesita crear una cuenta. Si ya se atendió con nosotros, lo reconocemos por su número.</div>
-                <div class="display"><span>+591</span>${disp}</div>
-                ${telValido() ? (p
-                    ? `<div class="found"><span class="av">${iniciales(p.nombre)}</span><div><b>¡Hola, ${esc(p.nombre)}!</b><small>Encontramos su registro</small></div></div>`
-                    : `<div class="found found--new"><div><b>Número nuevo</b><small>Escriba su nombre y quedará registrado</small></div></div>
-                       ${campo('nombre', 'Nombre completo', 'alpha', 'Toque para escribir su nombre')}`)
-                : S.tel.length === 8 ? '<div class="note note--warn">El número debe empezar con 6 o 7.</div>' : ''}
+                ${TECLADO_APP
+                    ? `<div class="display"><span>+591</span>${S.tel ? `<b>${S.tel.replace(/(\d{4})(?=\d)/, '$1 ')}</b><i class="caret"></i>` : '<b class="ph">7000 0000</b>'}</div>`
+                    : `<label class="display display--input"><span>+591</span><input data-tel type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="8" placeholder="7000 0000" value="${S.tel}" aria-label="Número de celular"></label>`}
+                <div id="tel-info">${telInfo()}</div>
                 <p class="demo-hint">Demo: <button data-a="demoTel" data-v="71234567">usar un número registrado</button> o <button data-a="demoTel" data-v="76543210">uno nuevo</button></p>
             </div>
-            <div class="pad">${['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((k) => `<button data-a="tecla" data-v="${k}">${k}</button>`).join('')}
-                <button class="k-fn" data-a="tecla" data-v="C">Borrar todo</button><button data-a="tecla" data-v="0">0</button><button class="k-fn" data-a="tecla" data-v="<">⌫</button></div>
-        </div>`;
-    },
+            ${TECLADO_APP ? `<div class="pad">${['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((k) => `<button data-a="tecla" data-v="${k}">${k}</button>`).join('')}
+                <button class="k-fn" data-a="tecla" data-v="C">Borrar todo</button><button data-a="tecla" data-v="0">0</button><button class="k-fn" data-a="tecla" data-v="<">⌫</button></div>` : ''}
+        </div>`,
 
     // 7 · facturación
     () => `<p class="lead">¿A nombre de quién emitimos la factura?</p>
@@ -262,12 +252,36 @@ function rangoDias(dias) {
     const consecutivos = d.every((x, i) => i === 0 || x === d[i - 1] + 1);
     return consecutivos && d.length > 2 ? `${DIAS[d[0]]} a ${DIAS[d[d.length - 1]]}` : d.map((x) => DIAS[x]).join(', ');
 }
+function listaEsp() {
+    const q = sinTildes(S.buscar.trim());
+    const l = ESPECIALIDADES.filter(([n]) => sinTildes(n).includes(q));
+    return `<div class="tiles">${l.map(([n, i, d]) => `<button class="tile" data-a="esp" data-v="${esc(n)}"><i>${ico(i)}</i><b>${esc(n)}</b><small>${esc(d)}</small></button>`).join('') || '<div class="empty">No encontramos esa especialidad.</div>'}</div>`;
+}
+function listaMed() {
+    const q = sinTildes(S.buscar.trim());
+    const l = MEDICOS.map((m, i) => [m, i]).filter(([m]) => (!S.esp || m[1] === S.esp) && (sinTildes(m[0]).includes(q) || sinTildes(m[1]).includes(q)));
+    return `<div class="docs">${l.map(([[n, e, dias, ini, fin], i]) => `<button class="doc" data-a="med" data-v="${i}"><span class="av">${iniciales(n)}</span>
+            <span><b>${esc(n)}</b><small>${esc(e)}</small><em>${rangoDias(dias)} · ${hhmm(ini * 60)} a ${hhmm(fin * 60)}</em></span><span class="go">›</span></button>`).join('') || '<div class="empty">No encontramos ese médico.</div>'}</div>`;
+}
+function telInfo() {
+    const p = paciente();
+    if (telValido()) return p
+        ? `<div class="found"><span class="av">${iniciales(p.nombre)}</span><div><b>¡Hola, ${esc(p.nombre)}!</b><small>Encontramos su registro</small></div></div>`
+        : `<div class="found found--new"><div><b>Número nuevo</b><small>Escriba su nombre y quedará registrado</small></div></div>
+           ${campo('nombre', 'Nombre completo', 'alpha', 'Toque para escribir su nombre')}`;
+    return S.tel.length === 8 ? '<div class="note note--warn">El número debe empezar con 6 o 7.</div>' : '';
+}
 function buscador(ph, chip) {
+    const quitar = chip ? `<span class="clear" data-a="quitarEsp">${esc(chip)} ✕</span>` : '';
+    if (!TECLADO_APP) return `<label class="search">${lupa}<input data-buscar type="search" enterkeyhint="search" autocomplete="off" placeholder="${ph}…" value="${esc(S.buscar)}" aria-label="${ph}">${quitar}</label>`;
     return `<div class="search" data-a="buscar" role="button" tabindex="0" aria-label="${ph}">${lupa}${S.buscar ? `<b>${esc(S.buscar)}</b>` : ph + '…'}
         ${chip ? `<span style="margin-left:auto" class="clear" data-a="quitarEsp">${esc(chip)} ✕</span>` : ''}${S.buscar ? `<button class="clear" data-a="limpiar">Borrar</button>` : ''}</div>`;
 }
+// tipo de teclado nativo para cada campo
+const NATIVO = { num: 'type="text" inputmode="numeric" autocomplete="off"', alpha: 'type="text" inputmode="text" autocapitalize="words" autocomplete="name"', email: 'type="email" inputmode="email" autocapitalize="off" autocomplete="email"' };
 function campo(clave, label, tipo, ph) {
     const v = S[clave];
+    if (!TECLADO_APP) return `<label class="field"><span>${label}</span><input class="field__input" data-k="${clave}" ${NATIVO[tipo]} enterkeyhint="next" placeholder="${ph.replace('Toque para escribir', 'Escriba')}" value="${esc(v)}"></label>`;
     return `<button class="field" data-a="campo" data-k="${clave}" data-t="${tipo}" data-l="${esc(label)}"><span>${label}</span><b class="${v ? '' : 'ph'}">${v ? esc(v) : ph}</b></button>`;
 }
 
@@ -300,6 +314,8 @@ function render() {
     screen.innerHTML = `<div class="screen__inner">${VISTAS[p]()}</div>`;
     screen.scrollTop = nuevoPaso ? 0 : scroll;
     $('#summary').hidden = p === 0 || p === 10;
+    $('#kbtoggle').hidden = !PASOS_CON_TEXTO.includes(p);
+    $('#kbtoggle').setAttribute('aria-pressed', TECLADO_APP);
     renderResumen();
     renderAcciones();
     if (p === 9 && nuevoPaso) iniciarTimerQR();
@@ -319,10 +335,11 @@ function renderResumen() {
 function renderAcciones() {
     const p = S.paso, pr = principal();
     const atras = p > 0 && p < 10 && !S.pagando;
-    $('#actions').innerHTML = `${atras ? '<button class="btn btn--ghost" data-a="atras"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>Atrás</button>' : ''}
-        ${pr?.info ? `<span class="actions__info">${pr.info}</span>` : ''}
+    // «Atrás» vive en el encabezado, pequeño y discreto
+    $('#btn-back').hidden = !atras;
+    $('#actions').innerHTML = `${pr?.info ? `<span class="actions__info">${pr.info}</span>` : ''}
         ${pr ? `<button class="btn btn--primary" data-a="siguiente"${pr.ok ? '' : ' disabled'}>${pr.txt}<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>` : ''}`;
-    $('#actions').hidden = !atras && !pr;
+    $('#actions').hidden = !pr;
 }
 
 /* ---------- acciones ---------- */
@@ -379,6 +396,41 @@ document.addEventListener('click', (e) => {
 });
 document.addEventListener('keydown', (e) => {
     if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role="button"][data-a]')) { e.preventDefault(); e.target.click(); }
+});
+$('#screen').addEventListener('input', (e) => {
+    const t = e.target;
+    if (t.matches('[data-buscar]')) {
+        S.buscar = t.value;
+        $('#lista').innerHTML = S.paso === 2 ? listaEsp() : listaMed();
+    } else if (t.matches('[data-tel]')) {
+        const v = t.value.replace(/\D/g, '').slice(0, 8);
+        if (t.value !== v) t.value = v;
+        if (v !== S.tel) { S.tel = v; autocompletar(); $('#tel-info').innerHTML = telInfo(); }
+    } else if (t.matches('.field__input')) {
+        S[t.dataset.k] = t.dataset.k === 'nit' ? t.value.replace(/\D/g, '') : t.value;
+        if (t.dataset.k === 'nit' && t.value !== S.nit) t.value = S.nit;
+    }
+    renderResumen(); renderAcciones();
+});
+// Enter: pasa al siguiente campo o continúa si el paso está completo
+$('#screen').addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' || !e.target.matches('input')) return;
+    e.preventDefault();
+    const campos = $$('#screen input'), i = campos.indexOf(e.target);
+    if (campos[i + 1]) return campos[i + 1].focus();
+    e.target.blur();
+    const btn = $('#actions .btn--primary');
+    if (btn && !btn.disabled) btn.click();
+});
+
+/* ---------- botón flotante: teclado del dispositivo / teclado del tótem ---------- */
+$('#kbtoggle').addEventListener('click', (e) => {
+    e.stopPropagation();
+    TECLADO_APP = !TECLADO_APP;
+    try { localStorage.setItem('totem.tecladoApp', TECLADO_APP ? '1' : '0'); } catch { /* sin almacenamiento */ }
+    if (document.activeElement?.matches('input')) document.activeElement.blur();
+    render();
+    toast(TECLADO_APP ? 'Teclado del tótem activado' : 'Usando el teclado del dispositivo');
 });
 
 /* ---------- pago ---------- */
@@ -490,7 +542,7 @@ document.addEventListener('keydown', (e) => {
         if (/^[0-9a-zA-ZñÑ@._-]$/.test(e.key)) return kbTecla(e.key.toUpperCase() === e.key && KB.tipo === 'email' ? e.key : e.key.toUpperCase());
         return;
     }
-    if (S.paso === 6 && !$('#kiosk').hidden) {
+    if (S.paso === 6 && TECLADO_APP && !$('#kiosk').hidden) {
         if (/^\d$/.test(e.key)) ACCIONES.tecla({ dataset: { v: e.key } });
         if (e.key === 'Backspace') ACCIONES.tecla({ dataset: { v: '<' } });
     }

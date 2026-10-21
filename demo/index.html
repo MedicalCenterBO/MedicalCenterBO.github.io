@@ -60,7 +60,12 @@
 <div class="kiosk" id="kiosk" hidden>
     <header class="top">
         <img class="top__logo" src="../assets/logo.png" alt="Clínica MedicalCenter">
-        <div class="top__title"><b id="step-title"></b><small id="step-sub"></small></div>
+        <div class="top__title">
+            <button class="top__back" id="btn-back" type="button" data-a="atras" aria-label="Volver al paso anterior" hidden>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <div><b id="step-title"></b><small id="step-sub"></small></div>
+        </div>
         <div class="top__right">
             <div class="top__clock"><b id="clock"></b><small id="date"></small></div>
             <button class="top__home" id="btn-home" type="button" aria-label="Volver al inicio">
@@ -72,7 +77,13 @@
     <nav class="steps" id="steps" aria-label="Progreso de la reserva"></nav>
 
     <div class="stage">
-        <main class="screen" id="screen" aria-live="polite"></main>
+        <div class="screenwrap">
+            <main class="screen" id="screen" aria-live="polite"></main>
+            <button class="kbtoggle" id="kbtoggle" type="button" aria-pressed="false" hidden aria-label="Usar el teclado en pantalla del tótem" title="Teclado del tótem">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2.5"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 13.5h.01M18 13.5h.01M9 15.5h6"/></svg>
+                <i class="kbtoggle__sw" aria-hidden="true"></i>
+            </button>
+        </div>
         <aside class="summary" id="summary" aria-label="Resumen de su reserva"></aside>
     </div>
 
