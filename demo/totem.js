@@ -308,7 +308,11 @@ function render() {
     const screen = $('#screen'), scroll = screen.scrollTop;
     $('#step-title').textContent = PASOS[p];
     $('#step-sub').textContent = SUB[p];
-    $('#steps').innerHTML = PASOS.slice(0, 10).map((t, i) => `<div class="step${i < p ? ' is-done' : ''}${i === p ? ' is-on' : ''}"><i></i><span>${t}</span></div>`).join('');
+    // para volver, se tocan los pasos ya completados de la barra de progreso
+    const puedeVolver = p < 10 && !S.pagando;
+    $('#steps').innerHTML = PASOS.slice(0, 10).map((t, i) => i < p && puedeVolver
+        ? `<button type="button" class="step is-done" data-a="paso" data-v="${i}" aria-label="Volver a ${t}"><i></i><span>${t}</span></button>`
+        : `<div class="step${i < p ? ' is-done' : ''}${i === p ? ' is-on' : ''}"${i === p ? ' aria-current="step"' : ''}><i></i><span>${t}</span></div>`).join('');
     // al actualizar dentro del mismo paso (una tecla, una ficha, un filtro) no se anima ni se mueve el scroll
     screen.classList.toggle('anim', nuevoPaso);
     screen.innerHTML = `<div class="screen__inner">${VISTAS[p]()}</div>`;
@@ -324,19 +328,17 @@ function render() {
 function renderResumen() {
     const f = fichaSel(), m = med(), p = paciente();
     const fila = (icono, label, val, opt) => `<div class="sum__row${val ? ' is-set' : ''}${opt ? ' opt' : ''}"><i>${ico(icono)}</i><div><small>${label}</small><b class="${val ? '' : 'vacio'}">${val || 'Sin elegir'}</b></div></div>`;
-    $('#summary').innerHTML = `<h3>Su reserva</h3>
+    $('#summary').innerHTML = `<h3>Su reserva</h3><div class="sum__rows">
         ${fila('hosp', 'Especialidad', esc(espActual() || ''))}
         ${fila('medico', 'Médico', m ? esc(m[0]) : '')}
         ${fila('cal', 'Fecha y ficha', f ? `${DIAS[FECHAS[S.dia].getDay()]} ${FECHAS[S.dia].getDate()} · Ficha ${f.n} · ${f.hora}` : '')}
         ${fila('recibo', 'Servicios', S.svc.size ? [...S.svc].map((i) => servicios()[i][0]).join(', ') : '', true)}
-        ${fila('user', 'Paciente', telValido() ? esc(p ? p.nombre : S.nombre || 'Nuevo paciente') : '', true)}
+        ${fila('user', 'Paciente', telValido() ? esc(p ? p.nombre : S.nombre || 'Nuevo paciente') : '', true)}</div>
         <div class="sum__total"><small>Total</small><b>${bs(total())}</b></div>`;
+    $('#summary').classList.toggle('is-empty', !espActual());
 }
 function renderAcciones() {
     const p = S.paso, pr = principal();
-    const atras = p > 0 && p < 10 && !S.pagando;
-    // «Atrás» vive en el encabezado, pequeño y discreto
-    $('#btn-back').hidden = !atras;
     $('#actions').innerHTML = `${pr?.info ? `<span class="actions__info">${pr.info}</span>` : ''}
         ${pr ? `<button class="btn btn--primary" data-a="siguiente"${pr.ok ? '' : ' disabled'}>${pr.txt}<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>` : ''}`;
     $('#actions').hidden = !pr;
@@ -372,6 +374,7 @@ const ACCIONES = {
     limpiar: () => { S.buscar = ''; render(); },
     campo: (t) => teclado({ label: t.dataset.l, tipo: t.dataset.t, valor: S[t.dataset.k], listo: (v) => { S[t.dataset.k] = v; render(); } }),
     aviso: (t) => toast(t.dataset.v),
+    paso: (t) => ir(+t.dataset.v),
     atras: () => {
         if (S.paso === 3 && !S.viaEsp) return ir(1);
         if (S.paso === 9) return ir(8);
@@ -448,6 +451,7 @@ function iniciarTimerQR() {
 }
 function pagar() {
     S.pagando = true; renderAcciones();
+    $$('button.step').forEach((b) => { b.disabled = true; });
     const li = $$('#pay-steps li'), paso = reduced ? 0 : 900;
     [1, 2, 3].forEach((i, k) => setTimeout(() => {
         li[i].className = 'done';
