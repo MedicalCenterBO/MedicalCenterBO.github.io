@@ -402,6 +402,14 @@ code, .mono { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; 
 .flow__step.is-on p { color: var(--ink); }
 .flow__step:focus-visible .flow__n { outline: 3px solid var(--green); outline-offset: 3px; }
 
+.demo-cta { display: flex; align-items: center; gap: 18px; margin-top: 28px; padding: 18px 22px; border-radius: var(--radius); background: linear-gradient(120deg, var(--green-900), var(--navy)); color: #e9f3ee; text-decoration: none; box-shadow: var(--shadow); transition: transform .2s var(--ease), box-shadow .2s; }
+.demo-cta:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.demo-cta__ico { width: 46px; height: 46px; flex: none; display: grid; place-items: center; border-radius: 12px; background: rgba(127, 220, 170, .16); color: #7fdcaa; }
+.demo-cta__txt { display: flex; flex-direction: column; gap: 2px; }
+.demo-cta__txt b { color: #fff; font-size: 1.05rem; }
+.demo-cta__txt small { color: #b8d4c7; font-size: .88rem; }
+.demo-cta__go { margin-left: auto; flex: none; font-weight: 700; color: #fff; background: var(--green); border-radius: 999px; padding: 10px 18px; font-size: .9rem; }
+@media (max-width: 640px) { .demo-cta { flex-wrap: wrap; } .demo-cta__go { margin-left: 0; } }
 .crm-demo { margin-top: 56px; }
 .crm-demo__intro { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; margin-bottom: 18px; }
 .crm-demo__intro h3 { font-family: var(--serif); font-weight: 500; font-size: 1.6rem; }
@@ -881,7 +889,7 @@ body.is-dragging, body.is-dragging * { cursor: grabbing !important; }
 @media print {
     html { scroll-behavior: auto; }
     body { font-size: 10.5pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .crm-demo, .flow__step p, .topbar, .progress, .hero__cta, .demo__tabs, .filters, .opt, .h4, .price__hint, .voice__toggle, #pay-sim, .float-card, .hero__glow { display: none !important; }
+    .crm-demo, .demo-cta, .flow__step p, .topbar, .progress, .hero__cta, .demo__tabs, .filters, .opt, .h4, .price__hint, .voice__toggle, #pay-sim, .float-card, .hero__glow { display: none !important; }
     .reveal { opacity: 1 !important; transform: none !important; }
     *, *::before, *::after { animation: none !important; transition: none !important; }
     .gantt__track i, .tr__bar i, .line__bar, .cuota__bar i { transform: none !important; }
